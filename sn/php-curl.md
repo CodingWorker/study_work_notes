@@ -62,12 +62,20 @@
 
 12. `curl_multi_exec` — 运行当前 cURL 句柄的子连接
 
+		int curl_multi_exec  ( resource $mh  , int &$still_running  )
+		处理在栈中的每一个句柄。无论该句柄需要读取或写入数据都可调用此方法。 
+
 
 13. `curl_multi_getcontent` — 如果设置了CURLOPT_RETURNTRANSFER，则返回获取的输出的文本流
 
+		string curl_multi_getcontent  ( resource $ch  )
+		如果 CURLOPT_RETURNTRANSFER 作为一个选项被设置到一个具体的句柄，那么这个函数将会以字符串的形式返回那个cURL句柄获取的内容。 
+
+14. `curl_multi_info_read` — 获取当前解析的cURL的相关传输信息
+
+		array curl_multi_info_read  ( resource $mh  [, int &$msgs_in_queue  = NULL    ] )
 
 
-14. curl_multi_info_read — 获取当前解析的cURL的相关传输信息
 15. curl_multi_init — 返回一个新cURL批处理句柄
 16. curl_multi_remove_handle — 移除curl批处理句柄资源中的某个句柄资源
 17. curl_multi_select — 等待所有cURL批处理中的活动连接
