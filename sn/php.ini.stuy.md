@@ -490,6 +490,15 @@ zend.script_encoding =
  360 ; on your server or not.
  361 ; http://php.net/expose-php
  362 expose_php = On
+
+混杂的/各种各样的/复杂对门的
+鉴于PHP被安装在服务器上的事实，几乎没有安全威胁。但是，这使得你能够决定是否在服务器上使用PHP，参考：http://php.net/expose-php
+expose_php = On，默认开启
+说明：
+我们经常会在一个http头里发现这样的信息：
+X-Powered-By:PHP/5.2.11
+PHP的版本号暴露无疑，攻击者很容易捕获到此信息，要想解决此问题我们只要设置此项为Off
+
  363 
  364 ;;;;;;;;;;;;;;;;;;;
  365 ; Resource Limits ;
@@ -520,6 +529,28 @@ zend.script_encoding =
  390 ; Maximum amount of memory a script may consume (128MB)
  391 ; http://php.net/memory-limit
  392 memory_limit = 128M
+
+资源控制
+每一个脚本的最大执行时间，以秒为单位，参考：http://php.net/max-execution-time，注意：在CLI SAPI情况下这一指令被硬编码为0
+max_execution_time = 30
+
+每一个脚本解析请求数据最大消耗时间。为了在生产服务器上排除不可预期的长时间运行脚本，最好限制此时间值。
+注意：在CLI SAPI情况下这条指令被硬编码为-1
+Default Value: -1 (Unlimited)
+Development Value: 60 (60 seconds)
+Production Value: 60 (60 seconds)
+http://php.net/max-input-time
+max_input_time = 60
+
+最大输入变量嵌套层级，参考：http://php.net/max-input-nesting-level
+max_input_nesting_level = 64
+
+可以接受多少的GET/POST/COOKIE输入变量
+max_input_vars = 1000
+
+一个脚本可能消耗的最大内存，参考：http://php.net/memory-limit
+memory_limit = 128M
+
  393 
  394 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
  395 ; Error handling and logging ;
@@ -539,6 +570,11 @@ zend.script_encoding =
  409 ; Note: The php.ini-development file has this setting as E_ALL. This
  410 ; means it pretty much reports everything which is exactly what you want during
  411 ; development and early testing.
+
+错误处理和日志
+这条指令使得你告诉PHP那些错误、警告、注意需要采取适当的处理。建议通过使用错误等级常量和按位操作符为这条指令设置值。下面给出了错误等级常量，为了方便还给出了通常的设置方式和他们的含义。默认情况下，PHP会对所有的错误、警告和注意采取适当的操作，除了那些与E_NOTICE和E_STRICT相关的。这些配置使得PHP表现良好并且建议使用PHP进行标准的编辑。为了性能的原因，这是推荐的错误报告配置，你的生产情况下服务器不应该在好的做法和标准的编码方面浪费资源。那是开发阶段服务器和开发阶段配置需要做的事情。
+注意：php.ini开发版文件将此项设置为E_ALL。这意味着它非常好的和多的报道了所有在开发和测试阶段你想要的东西。
+
  412 ;
  413 ; Error Level Constants:
  414 ; E_ALL             - All errors and warnings (includes E_STRICT as of PHP 5.4.0)
@@ -565,6 +601,25 @@ zend.script_encoding =
  435 ; E_DEPRECATED      - warn about code that will not work in future versions
  436 ;                     of PHP
  437 ; E_USER_DEPRECATED - user-generated deprecation warnings
+
+错误等级常量
+E_ALL             - 所有错误和警告 (includes E_STRICT as of PHP 5.4.0)
+E_ERROR           - 致命的运行阶段错误
+E_RECOVERABLE_ERROR  - 几乎执行的运行阶段错误
+E_WARNING         - 运行阶段警告 (non-fatal errors)
+E_PARSE           - 编译阶段 解析错误
+E_NOTICE          - 运行阶段notes,这些也是警告，通常是源自于代码的bug，但是他可能是故意的，例如使用了未经初始化的变量以为这样会自动初始化为一个空字符串，而PHP实际并不会自动初始化
+E_STRICT          - 运行阶段 notices, 可以获得PHP更改建议，这将能够保证好的交互性和代码的兼容性
+E_CORE_ERROR      - 在PHP初始化阶段产生的致命作物
+E_CORE_WARNING    - 在PHP初始化阶段产生警告而非致命错误
+E_COMPILE_ERROR   - 致命的编译错误
+E_COMPILE_WARNING - 编译阶段产生的警告而非致命错误
+E_USER_ERROR      - 用户自己生成的错误信息
+E_USER_WARNING    - 用户自己生成的警告信息
+E_USER_NOTICE     - 用户自己生成的注意信息
+E_DEPRECATED      - 警告这已经被未来的PHP版本放弃
+E_USER_DEPRECATED - 用户自定义的PHP放弃警告
+
  438 ;
  439 ; Common Values:
  440 ;   E_ALL (Show all errors, warnings and notices including coding standards.)
@@ -576,6 +631,18 @@ zend.script_encoding =
  446 ; Production Value: E_ALL & ~E_DEPRECATED & ~E_STRICT
  447 ; http://php.net/error-reporting
  448 error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT
+
+一般的值
+E_ALL (显示所有得errors, warnings and notices，包括不标准的代码)
+E_ALL & ~E_NOTICE  (除了notice显示所有错误警告)
+E_ALL & ~E_NOTICE & ~E_STRICT  (除了notice和标准编码警告外显示所有的错误)
+E_COMPILE_ERROR|E_RECOVERABLE_ERROR|E_ERROR|E_CORE_ERROR  (只显示错误)
+默认值为：E_ALL & ~E_NOTICE & ~E_STRICT & ~E_DEPRECATED
+开发阶段值：E_ALL
+生产阶段值：E_ALL & ~E_DEPRECATED & ~E_STRICT
+参考：http://php.net/error-reporting
+error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT，这个是当前设置
+
  449 
  450 ; This directive controls whether or not and where PHP will output errors,
  451 ; notices and warnings too. Error output is very useful during development, but
@@ -593,6 +660,19 @@ zend.script_encoding =
  463 ; Production Value: Off
  464 ; http://php.net/display-errors
  465 display_errors = Off
+
+这条指令控制PHP是否以及在哪里输出错误、notice/warning信息。在开发阶段输出错误非常有用，但是在生产环境输出错误信息则非常危险。这依赖于出发错误的代码，某些敏感信息可能会潜在的泄露到你的应用，如数据库用户名和密码或者更糟糕。在生产环境下，我们建议日志记录错误信息而不是将他们标准输出：
+可能的值：
+Off = 不显示任何错误信息
+stderr = 将错误显示到终端/文件 (仅仅影响CGI/CLI 文件!)
+On or stdout = 输出错误信息到标准输出设备
+ 461 ; Default Value: On
+ 462 ; Development Value: On
+ 463 ; Production Value: Off
+ 464 ; http://php.net/display-errors
+ 465 display_errors = Off
+默认值是开启的，即为On,开发环境下值为On,生产环境下值为Off,参考：http://php.net/display-errors，display_errors = Off，这是此配置的设置
+
  466 
  467 ; The display of errors which occur during PHP's startup sequence are handled
  468 ; separately from display_errors. PHP's default behavior is to suppress those
@@ -604,6 +684,11 @@ zend.script_encoding =
  474 ; Production Value: Off
  475 ; http://php.net/display-startup-errors
  476 display_startup_errors = Off
+
+显示错误信息发生在PHP的运行队列开始运行时。PHP的默认行为是抑制来自客户端浏览器的错误。开启显示错误配置在debug环境下非常的有用，我们强烈建议你在生产阶段关闭此配置
+默认值为：Off,开发阶段值为On,生产阶段值为Off,参考：http://php.net/display-startup-errors，这里配置为
+display_startup_errors = Off
+
  477 
  478 ; Besides displaying errors, PHP can also log errors to locations such as a
  479 ; server-specific log, STDERR, or a location specified by the error_log
@@ -614,31 +699,51 @@ zend.script_encoding =
  484 ; Production Value: On
  485 ; http://php.net/log-errors
  486 log_errors = On
+
+除了显示错误，PHP也能够将错误记录到指定的服务器日子文件呢、标准文件或者下面error_log指令可以找到的路径。尽管在生产环境下错误不应该显示，但是服务器应该仍然能够监视并记录错误
+默认值为Off,开发环境下的值为Off,生产环境下的值为On,参考：http://php.net/log-errors，这里配置为：log_errors = On
+
  487 
  488 ; Set maximum length of log_errors. In error_log information about the source is
  489 ; added. The default is 1024 and 0 allows to not apply any maximum length at all.
  490 ; http://php.net/log-errors-max-len
  491 log_errors_max_len = 1024
+
+设置记录错误的最大长度。在错误日志信息中加入此项，默认的是1024，0表示不限制大小。参考：http://php.net/log-errors-max-len，这里的配置是
+log_errors_max_len = 1024
+
  492 
  493 ; Do not log repeated messages. Repeated errors must occur in same file on same
  494 ; line unless ignore_repeated_source is set true.
  495 ; http://php.net/ignore-repeated-errors
  496 ignore_repeated_errors = Off
+
+不要记录重复的信息。记录重复的错误信息指的是在同一文件的同一行发生的错误除非将此配置项设置为true。参考：http://php.net/ignore-repeated-errors，这里的配置为ignore_repeated_errors = Off
+
  497 
  498 ; Ignore source of message when ignoring repeated messages. When this setting
  499 ; is On you will not log errors with repeated messages from different files or
  500 ; source lines.
  501 ; http://php.net/ignore-repeated-source
  502 ignore_repeated_source = Off
+
+当忽略了重复信息时忽略信息的源。当这个配置被开启，将不会记录不同的文件或不同行产生的重复信息，参考：http://php.net/ignore-repeated-source，这里的配置为ignore_repeated_source = Off
+
  503 
  504 ; If this parameter is set to Off, then memory leaks will not be shown (on
  505 ; stdout or in the log). This has only effect in a debug compile, and if
  506 ; error reporting includes E_WARNING in the allowed list
  507 ; http://php.net/report-memleaks
  508 report_memleaks = On
+
+如果这里的配置设置为Off,那么内存泄露将不会显示在标准输出终端或者日志中。只有在debug编译下以及设置了error reporting includes E_WARNING情况下此配置项才会起作用，参考：http://php.net/report-memleaks，这里的配置为report_memleaks = On
+
  509 
  510 ; This setting is on by default.
  511 ;report_zend_debug = 0
+
+默认的这项配置开启了，report_zend_debug = 0这个被注释了则是开启
+
  512 
  513 ; Store the last error/warning message in $php_errormsg (boolean). Setting this value
  514 ; to On can assist in debugging and is appropriate for development servers. It should
@@ -648,13 +753,24 @@ zend.script_encoding =
  518 ; Production Value: Off
  519 ; http://php.net/track-errors
  520 track_errors = Off
+
+在$php_errormsg中存储最后的错误和警告信息。开启这个配置项在debug和开发环境下有帮助。在生产环境下应该关闭
+默认值为Off,开发环境下为Off，生产环境下为On,参考：http://php.net/track-errors，这里的配置为track_errors = Off
+
  521 
  522 ; Turn off normal error reporting and emit XML-RPC error XML
  523 ; http://php.net/xmlrpc-errors
  524 ;xmlrpc_errors = 0
+
+关闭正常的错误报告，输出XML-RPC错误，参考：http://php.net/xmlrpc-errors，这里的配置是xmlrpc_errors = 0
+
  525 
  526 ; An XML-RPC faultCode
  527 ;xmlrpc_error_number = 0
+
+一个XML-RPC故障代码
+xmlrpc_error_number = 0
+
  528 
  529 ; When PHP displays or logs an error, it has the capability of formatting the
  530 ; error message as HTML for easier reading. This directive controls whether
@@ -665,6 +781,11 @@ zend.script_encoding =
  535 ; Production value: On
  536 ; http://php.net/html-errors
  537 html_errors = On
+
+当PHP显示或者将一个错误计入了日志，它就有能力以html的格式来格式化错误信息以便于阅读。纸条指令控制错误信息是否以html格式来组织。注意：在CLI SAPI情况下这条指令被硬编码为Off。
+默认值为On,开发环境下为On,生产环境下为On,参考：http://php.net/html-errors，
+这配置为：html_errors = On
+
  538 
  539 ; If html_errors is set to On *and* docref_root is not empty, then PHP
  540 ; produces clickable error messages that direct to a page describing the error
@@ -681,18 +802,31 @@ zend.script_encoding =
  551 
  552 ; http://php.net/docref-ext
  553 ;docref_ext = .html
+
+如果html_errors设置为On并且docref_root不为空，那么PHP产生出一个可以点击的错误信息用于点击后直接跳转到一个详细描述此错误或者导致此错误的函数的页面。你可以下载一份PHP手册的副本从http://php.net/docs，然后改变docref_root为你本地副本的基本url（包含最后的/）。你还必须指定特定的文件扩展名（包含.）。PHP的默认将这些值设置为空值，因此没有产生连接到文档的链接。
+注意：在生产环境下不要使用此特性。
+示例：docref_root = "/phpmanual/"，（参考：http://php.net/docref-ext）docref_ext = .html
+
  554 
  555 ; String to output before an error message. PHP's default behavior is to leave
  556 ; this setting blank.
  557 ; http://php.net/error-prepend-string
  558 ; Example:
  559 ;error_prepend_string = "<span style='color: #ff0000'>"
+
+在错误信息输出之前输出这里配置的字符串，PHP默认此配置项为空。参考：http://php.net/error-prepend-string
+示例：error_prepend_string = "<span style='color: #ff0000'>"
+
  560 
  561 ; String to output after an error message. PHP's default behavior is to leave
  562 ; this setting blank.
  563 ; http://php.net/error-append-string
  564 ; Example:
  565 ;error_append_string = "</span>"
+
+在错误信息输出之后输出这里配置的字符串，PHP默认此配置项为空。参考：http://php.net/error-prepend-string
+示例：error_append_string = "</span>"
+
  566 
  567 ; Log errors to specified file. PHP's default behavior is to leave this value
  568 ; empty.
@@ -701,11 +835,19 @@ zend.script_encoding =
  571 ;error_log = php_errors.log
  572 ; Log errors to syslog (Event Log on Windows).
  573 ;error_log = syslog
+
+记录错误信息到指定的文件。PHP默认此配置项为空，参考：http://php.net/error-log
+示例：error_log = php_errors.log
+记录错误信息到syslog (Event Log on Windows)，这样配置error_log = syslog
+
  574 
  575 ;windows.show_crt_warning
  576 ; Default value: 0
  577 ; Development value: 0
  578 ; Production value: 0
+
+windows显示crt_warning警告，默认值为0，开发环境下为0，生产环境下为0
+
  579 
  580 ;;;;;;;;;;;;;;;;;
  581 ; Data Handling ;
