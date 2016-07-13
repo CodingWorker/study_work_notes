@@ -857,7 +857,11 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  585 ; PHP's default setting is "&".
  586 ; http://php.net/arg-separator.output
  587 ; Example:
- 588 ;arg_separator.output = "&amp;"
+ 588 ;arg_separator.output = "&amp;"，
+
+数据处理
+在PHP中使用的分离器用于分离参数以分离URL地址。PHP的默认设置为&符号。参考：http://php.net/arg-separator.output，例如：arg_separator.output = "&amp;"这里的&amp;为html实体
+
  589 
  590 ; List of separator(s) used by PHP to parse input URLs into variables.
  591 ; PHP's default setting is "&".
@@ -865,6 +869,9 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  593 ; http://php.net/arg-separator.input
  594 ; Example:
  595 ;arg_separator.input = ";&"
+
+这个配置是被PHP使用的解析输入的url地址参数的分离器列表。PHP的默认设置为&。注意：这条指令的每个字符都被当做分离器。参考：http://php.net/arg-separator.input，示例：arg_separator.input = ";&"
+
  596 
  597 ; This directive determines which super global arrays are registered when PHP
  598 ; starts up. G,P,C,E & S are abbreviations for the following respective super
@@ -878,6 +885,9 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  606 ; Production Value: "GPCS";
  607 ; http://php.net/variables-order
  608 variables_order = "GPCS"
+
+这条指令决定当PHP启动时哪些全局数组被注册。G,P,C,E & S是下面相关全局数组的缩写：GET, POST, COOKIE, ENV and SERVER。为了注册这些数组会PHP会存在一些性能上的损失，在生产环境下不推荐开启ENV。但是你仍然可以通过使用函数getenv()来连接使用环境变量。默认的值为"EGPCS"，开发环境下默认值为"GPCS"，生产环境下值为"GPCS"，参考：http://php.net/variables-order，这里的配置为variables_order = "GPCS"
+
  609 
  610 ; This directive determines which super global data (G,P & C) should be
  611 ; registered into the super global array REQUEST. If so, it also determines
@@ -891,6 +901,9 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  619 ; Production Value: "GP"
  620 ; http://php.net/request-order
  621 request_order = "GP"
+
+这条指令决定哪些全局变量数据(G,P & C)应该被注册到全局数组REQUEST中。如果设置了的话，它也决定了数据被注册的顺序（即同名变量会保存后面的）。这条指令的值的含义与variables_order指令相同。将这条指令设置为空会导致PHP使用variables_order指令设置的值。它并不意味着将全局数组REQUEST设置为空。默认的值为none,开发环境下的值为GP，生产环境下的值为GP，参考：http://php.net/request-order，这里的配置为request_order = "GP"。
+
  622 
  623 ; This directive determines whether PHP registers $argv & $argc each time it
  624 ; runs. $argv contains an array of all the arguments passed to PHP when a script
@@ -906,6 +919,9 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  634 ; Production Value: Off
  635 ; http://php.net/register-argc-argv
  636 register_argc_argv = Off
+
+这条指令决定当PHP每次运行时是否注册$argv 和 $argc。$argv包括一个当脚本被调用时所有传递到PHP的参数的一个数组。$argc为一个当脚本被调用时传递到PHP的参数的个数的整数。当在命令行运行脚本时这些数组非常的有用。当这条指令被开启时，每一次脚本被执行时注册这些变量都要消耗CPU和内存。处于性能的原因，应该在生产环境下禁用这些特性。注意：在CLI SAPI情况下，这条指令被硬编码为On。默认值为On,开发环境下值为Off,生产环境下值为Off,参考：http://php.net/register-argc-argv。这里的配置值为register_argc_argv = Off
+
  637 
  638 ; When enabled, the ENV, REQUEST and SERVER variables are created when they're
  639 ; first used (Just In Time) instead of when the script starts. If these
@@ -914,6 +930,9 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  642 ; for this directive to have any affect.
  643 ; http://php.net/auto-globals-jit
  644 auto_globals_jit = On
+
+当这条指令被开启时，ENV, REQUEST and SERVER在第一次被使用时就被创建了而不是在脚本开始时。如果在一个脚本中这些变量没有被使用，开启这条指令将会导致性能增益。为了使得这条指令起作用必须禁用PHP的register_argc_argv指令。参考：http://php.net/auto-globals-jit。这里的配置为：auto_globals_jit = On。
+
  645 
  646 ; Whether PHP will read the POST data.
  647 ; This option is enabled by default.
@@ -923,20 +942,32 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  651 ; to proxy requests or to process the POST data in a memory efficient fashion.
  652 ; http://php.net/enable-post-data-reading
  653 ;enable_post_data_reading = Off
+
+无论PHP是否读取POST数据，这个选项默认都是开启的。更可能的是，你不想整体的禁用这个选项。这会导致￥——POST和$_FILES总是为空。你可能读取$_POST数据的唯一途径是通过php://input流包装。在代理请求或者在内存中运行$_POST数据时非常有用。
+
  654 
  655 ; Maximum size of POST data that PHP will accept.
  656 ; Its value may be 0 to disable the limit. It is ignored if POST data reading
  657 ; is disabled through enable_post_data_reading.
  658 ; http://php.net/post-max-size
  659 post_max_size = 8M
+
+这条指令规定PHP通过POST方式可接受的数据的最大大小。如果设置为0表示没有限制。如果通过enable_post_data_reading指令禁用了读取POST数据则会忽略这条指令。参考：http://php.net/post-max-siz，这里的配置为post_max_size = 8M。
+
  660 
  661 ; Automatically add files before PHP document.
  662 ; http://php.net/auto-prepend-file
  663 auto_prepend_file =
+
+这条指令会在PHP文档之前自动添加文件，参考：http://php.net/auto-prepend-file。这里的配置为：auto_prepend_file =
+
  664 
  665 ; Automatically add files after PHP document.
  666 ; http://php.net/auto-append-file
  667 auto_append_file =
+
+这条指令会在PHP文档之后自动添加文件，参考：http://php.net/auto-prepend-file。这里的配置为：auto_prepend_file =
+
  668 
  669 ; By default, PHP will output a media type using the Content-Type header. To
  670 ; disable this, simply set it to be empty.
@@ -944,20 +975,33 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  672 ; PHP's built-in default media type is set to text/html.
  673 ; http://php.net/default-mimetype
  674 default_mimetype = "text/html"
+
+默认的，PHP能够通过制定头部Content-Type header来输出一个媒体类型的数据。为了禁用此项设置，只需简单的将此指令设置为空。
+PHP内置的默认媒体类型被设置为text/html。参考：http://php.net/default-mimetype。这里的配置为：default_mimetype = "text/html"
+
  675 
  676 ; PHP's default character set is set to UTF-8.
  677 ; http://php.net/default-charset
  678 default_charset = "UTF-8"
+
+PHP默认的字符集被设置为UTF-8，参考： http://php.net/default-charset。这里的配置为default_charset = "UTF-8"。
+
  679 
  680 ; PHP internal character encoding is set to empty.
  681 ; If empty, default_charset is used.
  682 ; http://php.net/internal-encoding
  683 ;internal_encoding =
+
+PHP内部的字符集encoding被设置为空，如果设置为空则默认的default_charset被使用，即使用上调指令的设置值。参考：http://php.net/internal-encoding。这里的配置为：internal_encoding =
+
  684 
  685 ; PHP input character encoding is set to empty.
  686 ; If empty, default_charset is used.
  687 ; http://php.net/input-encoding
  688 ;input_encoding =
+
+PHP读输入数据的编码被设置为空，如果被设置为空则使用default_charset指定的字符集。参考：http://php.net/input-encoding。这里的配置为input_encoding =。
+
  689 
  690 ; PHP output character encoding is set to empty.
  691 ; If empty, default_charset is used.
@@ -965,9 +1009,12 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  693 ; See also output_buffer.
  694 ; http://php.net/output-encoding
  695 ;output_encoding =
+
+PHP输出数据的编码被设置为空，如果被设置为空则使用default_charset的设置值。mbstring 或者 iconv输出处理会被使用。查看输出缓冲。参考：http://php.net/output-encoding。这里的配置为output_encoding =。
+
  696 
  697 ;;;;;;;;;;;;;;;;;;;;;;;;;
- 698 ; Paths and Directories ;
+ 698 ; Paths and Directories ;路径和目录
  699 ;;;;;;;;;;;;;;;;;;;;;;;;;
  700 
  701 ; UNIX: "/path1:/path2"
@@ -975,9 +1022,16 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  703 ;
  704 ; Windows: "\path1;\path2"
  705 ;include_path = ".;c:\php\includes"
+
+UNIX的格式为："/path1:/path2"，示例：include_path = ".:/php/includes"
+Windows的格式为：Windows: "\path1;\path2"，示例：include_path = ".;c:\php\includes"
+
  706 ;
  707 ; PHP's default setting for include_path is ".;/path/to/php/pear"
  708 ; http://php.net/include-path
+
+PHP的为include_path默认设置为".;/path/to/php/pear"，参考：http://php.net/include-path
+
  709 
  710 ; The root of the PHP pages, used only if nonempty.
  711 ; if PHP was not compiled with FORCE_REDIRECT, you SHOULD set doc_root
@@ -986,27 +1040,43 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  714 ; cgi.force_redirect configuration below
  715 ; http://php.net/doc-root
  716 doc_root =
+
+PHP文件的根目录，只有非空时才被使用。如果PHP没有被FORCE_REDIRECT编译，你应该设置此选项
+如果你在除了IIS以外得服务器下将PHP作为CGI来运行时则查看文档中以了解更多的安全问题。这时可以选择使用下面的cgi.force_redirect配置。参考：http://php.net/doc-root。这里的配置为doc_root =
+
  717 
  718 ; The directory under which PHP opens the script using /~username used only
  719 ; if nonempty.
  720 ; http://php.net/user-dir
  721 user_dir =
+
+只有在下一条指令不为空的情况下，当PHP使用/~username代开脚本时下面的指令才被使用，参考：http://php.net/user-dir。这里的配置为：user_dir =
+
  722 
  723 ; Directory in which the loadable extensions (modules) reside.
  724 ; http://php.net/extension-dir
  725 ; extension_dir = "./"
  726 ; On windows:
  727 ; extension_dir = "ext"
+
+这个选项指定可以加载的扩展模块存储的目录。参考：http://php.net/extension-dir。扩展目录设置：extension_dir = "./"，在windows下配置为extension_dir = "ext"。
+
  728 
  729 ; Directory where the temporary files should be placed.
  730 ; Defaults to the system default (see sys_get_temp_dir)
  731 ; sys_temp_dir = "/tmp"
+
+这条指令指定临时文件存储的目录，默认的存储路径为系统默认的路径（查看选项sys_get_temp_dir),这里的配置为：sys_temp_dir = "/tmp"
+
  732 
  733 ; Whether or not to enable the dl() function.  The dl() function does NOT work
  734 ; properly in multithreaded servers, such as IIS or Zeus, and is automatically
  735 ; disabled on them.
  736 ; http://php.net/enable-dl
  737 enable_dl = Off
+
+这个选项指定是否启用dl()函数。在多线程服务器上dl()函数工作的不是很好，如IIS或者Zeus，而且在这些服务器上自动禁用了这个函数。参考：http://php.net/enable-dl。这里的配置为enable_dl = Off。
+
  738 
  739 ; cgi.force_redirect is necessary to provide security running PHP as a CGI under
  740 ; most web servers.  Left undefined, PHP turns this on by default.  You can
@@ -1014,10 +1084,17 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  742 ; **You CAN safely turn this off for IIS, in fact, you MUST.**
  743 ; http://php.net/cgi.force-redirect
  744 ;cgi.force_redirect = 1
+
+在大多数服务器中，将PHP作为CGI来运行时cgi.force_redirect选项能够提供必要的安全性。如果这个选项不被定义则PHP默认开启此项配置。你可以在这里将它关闭。你可以在IIS下安全的关闭此项设置，事实上你必须这样做。
+参考：http://php.net/cgi.force-redirect。这里的配置为：cgi.force_redirect = 1
+
  745 
  746 ; if cgi.nph is enabled it will force cgi to always sent Status: 200 with
  747 ; every request. PHP's default behavior is to disable this feature.
  748 ;cgi.nph = 1
+
+如果cgi.nph被开启的话，他将会总是对每一个请求发送200状态码。PHP默认禁用了这一特性。这里的配置为：cgi.nph = 1
+
  749 
  750 ; if cgi.force_redirect is turned on, and you are not running under Apache or Netscape
  751 ; (iPlanet) web servers, you MAY need to set an environment variable name that PHP
@@ -1025,6 +1102,9 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  753 ; cause security issues, KNOW WHAT YOU ARE DOING FIRST.
  754 ; http://php.net/cgi.redirect-status-env
  755 ;cgi.redirect_status_env =
+
+如果选项cgi.force_redirect被开启了而且你没有再apache或者netscape网路服务器下运行PHP，你也许需要设置一个环境变量名供PHP查询以是PHP知道继续运行时ok的。设置这个变量也许会导致安全问题，你要知道自己正在做什么。参考：http://php.net/cgi.redirect-status-env，这里的配置为：cgi.redirect_status_env =
+
  756 
  757 ; cgi.fix_pathinfo provides *real* PATH_INFO/PATH_TRANSLATED support for CGI.  PHP's
  758 ; previous behaviour was to set PATH_TRANSLATED to SCRIPT_FILENAME, and to not grok
@@ -1034,6 +1114,9 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  762 ; to use SCRIPT_FILENAME rather than PATH_TRANSLATED.
  763 ; http://php.net/cgi.fix-pathinfo
  764 ;cgi.fix_pathinfo=1
+
+cgi.fix_pathinfo选项为CGI提供了绝对路径转换。PHP的之前的行为是将PATH_TRANSLATED设置到SCRIPT_FILENAME。并且不获得PATH_INFO是什么。查看cgi specs以获得更多信息。将这个值设置为1将会导致PHP项以前一样工作。默认值为1。你需要修改你的脚本使用SCRIPT_FILENAME而不是PATH_TRANSLATED。参考：http://php.net/cgi.fix-pathinfo，这里的配置为：cgi.fix_pathinfo=1
+
  765 
  766 ; FastCGI under IIS (on WINNT based OS) supports the ability to impersonate
  767 ; security tokens of the calling client.  This allows IIS to define the
@@ -1042,10 +1125,16 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  770 ; Set to 1 if running under IIS.  Default is zero.
  771 ; http://php.net/fastcgi.impersonate
  772 ;fastcgi.impersonate = 1
+
+在基于winnt系统的IIS服务器下的FastCGI支持冒充客户端的安全令牌功能。这个选项允许IIS定义在他之下运行的请求的安全上下文。在apache下的mod_fastcgi目前不支持这个特性。如果在IIS下运行将此选项设置为1，默认值为0.参考：http://php.net/fastcgi.impersonate。这里的配置为：fastcgi.impersonate = 1
+
  773 
  774 ; Disable logging through FastCGI connection. PHP's default behavior is to enable
  775 ; this feature.
  776 ;fastcgi.logging = 0
+
+这条指令使得通过FashCGI连接时禁用日志。PHP的默认行为会启用这个特性。这里的配置为fastcgi.logging = 0
+
  777 
  778 ; cgi.rfc2616_headers configuration option tells PHP what type of headers to
  779 ; use when sending HTTP response code. If set to 0, PHP sends Status: header that
@@ -1054,6 +1143,9 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  782 ; Default is zero.
  783 ; http://php.net/cgi.rfc2616-headers
  784 ;cgi.rfc2616_headers = 0
+
+cgi.rfc2616_headers配置选项告诉PHP当发送HTTP相应代码时使用哪些headers类型。如果爱能够此项设置为0，PHP发送得状态码为：apache支持的头类型。当这个选项设置为1，PHP将会发送RFC2616兼容的头。默认值为0，参考：http://php.net/cgi.rfc2616-headers。这里的配置为：cgi.rfc2616_headers = 0。
+
  785 
  786 ;;;;;;;;;;;;;;;;
  787 ; File Uploads ;
@@ -1074,6 +1166,16 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  802 
  803 ; Maximum number of files that can be uploaded via a single request
  804 max_file_uploads = 20
+
+文件上传配置
+是否允许http文件上传功能，参考：http://php.net/file-uploads，这里的配置为：file_uploads = On
+
+http上传文件存储的路径（如果没有指定则默认使用系统的），参考：http://php.net/upload-tmp-dir。这里的配置为upload_tmp_dir =。
+
+最大允许上传文件的大小，参考：http://php.net/upload-max-filesize。这里的配置为：upload_max_filesize = 2M。
+
+在一个单一请求中最大允许上传的文件数目，这里的配置为：upload_max_filesize = 2M
+
  805 
  806 ;;;;;;;;;;;;;;;;;;
  807 ; Fopen wrappers ;
@@ -1107,6 +1209,12 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  835 ; fgets() and file() will work regardless of the source of the file.
  836 ; http://php.net/auto-detect-line-endings
  837 ;auto_detect_line_endings = Off
+
+文件打开封装
+是否允许将url地址（像http:// 或者ftp://样式的)当做文件来看待。参考：http://php.net/allow-url-fopen。这里的配置为：allow_url_fopen = On（应该是使得fopen可以打开网址）
+
+定义匿名的ftp账户密码（你的电子邮件地址）。PHP默认将此项设置为空。参考：http://php.net/from。这里的配置为：from="john@doe.com"
+
  838 
  839 ;;;;;;;;;;;;;;;;;;;;;;
  840 ; Dynamic Extensions ;
@@ -1137,6 +1245,18 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  865 ; Note that many DLL files are located in the extensions/ (PHP 4) ext/ (PHP 5+)
  866 ; extension folders as well as the separate PECL DLL download (PHP 5+).
  867 ; Be sure to appropriately set the extension_dir directive.
+
+如果你希望扩展自动加载，使用下面的语法：extension=modulename.extension
+示例：
+在windows中：extension=msql.dll
+或者在unix下，extension=msql.so
+或者添加路径，extension=/path/to/extension/msql.so
+
+如果你只提供了扩展的名字，PHP将会在它的默认扩展文件中查找此文件（即上面前两种情况）
+windows扩展：
+注意：PHP内置了ODBC支持。因此dll不是必须的。
+注意：许多动态扩展文件被放在了PHP4的extension文件夹或者PHP5+的ext文件夹下，也包括单独下载的PECL动态库。因此确定恰当的设置了扩展文件目录。
+
  868 ;
  869 ;extension=php_bz2.dll
  870 ;extension=php_curl.dll
