@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 
 public class SquareSample
 {
@@ -12,7 +12,7 @@ class SquareApp
 {
     public static void Main()
     {
-        SquareSample sq =new SquareSample();
+        SquareSample sq = new SquareSample();
         Console.WriteLine(sq.CalcSquare(25).ToString());
     }
 }
