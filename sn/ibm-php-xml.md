@@ -117,15 +117,107 @@ xml非常啰嗦，存储体积大，消耗带宽多
 	 
 	 ?>
 
+##使用简单的simplexml
 
+###访问元素的值
+	$xml=<<<xml
+	<?xml version='1.0' standalone='yes'?>
+	<books>
+	<book>
+	 <title>Great American Novel</title>
+	 <characters>
+	 <character>
+	 <name>Cliff</name>
+	 <desc>really great guy</desc>
+	 </character>
+	 <character>
+	 <name>Lovely Woman</name>
+	 <desc>matchless beauty</desc>
+	 </character>
+	 <character>
+	 <name>Loyal Dog</name>
+	 <desc>sleepy</desc>
+	 </character>
+	 </characters>
+	 <plot>
+	 Cliff meets Lovely Woman. Loyal Dog sleeps, but wakes up to bark
+	 at mailman.
+	 </plot>
+	 <success type="bestseller">4</success>
+	 <success type="bookclubs">9</success>
+	 </book>
+	 </books>
+	xml;
+	
+	$xml=new SimpleXMLElement($xml);
+	var_dump($xml->book[0]);
+	echo $xml->book[0]->plot;
 
+###访问元素的属性
 
+	$xml = new SimpleXMLElement($xmlstr);
+ 
+	 foreach ($xml->book[0]->success as $success) {
+	 switch((string) $success['type']) { // Get attributes as element indices，可见要获得值需要强制类型转换
+	 case 'bestseller':
+	 echo $success, ' months on bestseller list';
+	 break;
+	 case 'bookclubs':
+	 echo $success, ' bookclub listings';
+	 break;
+	 }
+	 }
+	要把元素或属性和字符串进行比较，或者将其传递给需要字符串参数的函数，必须使用（string）强制转换成字符串。否则，默认情况下 PHP 将元素看作对象，如清单 10 所示。
 
+###修改文本节点
 
+	$xml = new SimpleXMLElement($xmlstr);
+ 	$xml->book[0]->characters->character[0]->name = 'Big Cliff';
+ 	echo $xml->asXML();
 
+	$xml->book->characters->character->name="afafafafafadfadfasdfa";
+	var_dump($xml->book->characters->character->name);
 
+###增加元素和属性
 
+	 $character = $xml->book[0]->characters->addChild('character');
+	 $character->addChild('name', 'Yellow Cat');
+	 $character->addChild('desc', 'aloof');
+	 
+	 $success = $xml->book[0]->addChild('success', '2');
+	 $success-> $rating->addAttribute('type', 'reprints');
+	 
+	 echo $xml->asXML();
 
+- 增加元素
+
+		$characters = $xml->book->characters;
+		// print_r($characters);
+		$character = $characters->addChild("character");
+		$character->addChild("name","namenamename");
+		$character->addChild("desc","descdescdesc");
+		
+		print_r($xml);
+
+-增加属性
+
+	$success = $xml->book->addChild('success', 'haha');
+	$success->addAttribute('typetype', 'DIYtype');
+	var_dump($xml->book->success[2]->asxml());
+
+#第 2 部分: 高级 XML 解析技术
+
+- 解析xml有两种方式：树和流
+- 树解析需要将整个xml文档加载到内存，从而可以随机访问元素和编辑xml,在PHP中的解析器如DOM和simplexml，这两个解析器可与共享树结构
+- 流解析不将文档加载到内存，而是每次提交少量数据已节约带宽和内存，在流解析中只能访问当前的节点而且不能将xml当做一个文档来编辑，解析器如sax和xmlreader
+
+##基于树的解析器-DOM和SimpleXML
+
+**DOM要创建整个的文档树，要占用大量的内存和处理器时间**
+
+###使用DOM
+
+使用DOM可以构建、修改、查询、验证和转换xml文档。可以利用所有得DOM方法和属性
 
 
 

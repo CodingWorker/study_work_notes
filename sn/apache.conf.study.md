@@ -45,7 +45,11 @@
 # will be used by default.  It is recommended that you always supply
 # an explicit drive letter in absolute paths to avoid confusion.
 
+----------
+
 注意：当文件名字被指定时，你必须使用前下划线而不是反斜线（例如c:/apache而不是c:\apache）。如果省略了一个文件夹驱动器名字的一个字母（应该就是c d e f ），那么httpd.exe所在的驱动器将被作为默认的驱动器使用。建议你总是以绝对路径名提供明确的驱动盘字母以避免混淆。
+
+----------
 
 #
 # ServerRoot: The top of the directory tree under which the server's
@@ -80,8 +84,12 @@ PidFile为第一个httpd进程的进程号文件的位置
 #
 # Mutex default:logs
 
+----------
+
 互斥器选项：允许你为每一个互斥器设置互斥机制和互斥文件指令或者改变全局默认值。如果互斥器是基于文件的而且默认互斥器文件目录不在本地磁盘上或者由于某种原因不合适，那么就不要取消和更改。
 互斥默认为：日志
+
+----------
 
 #
 # Listen: Allows you to bind Apache to specific IP addresses and/or
@@ -94,8 +102,12 @@ PidFile为第一个httpd进程的进程号文件的位置
 #Listen 12.34.56.78:80
 Listen 80
 
+----------
+
 监听端口号：这一个选项允许你将apache绑定到指定的IP地址和/或者端口而不是采用默认值。也可以参考查看<VirtualHost>指令。
 改变这个选项为像下面显示的那样指定监听特定的ip地址，从而阻止了apache扫描所有绑定的IP地址。
+
+----------
 
 #
 # Dynamic Shared Object (DSO) Support
@@ -109,9 +121,13 @@ Listen 80
 # Example:
 # LoadModule foo_module modules/mod_foo.so
 
+----------
+
 动态共享对象支持：
 为了使用一个被作为DSO而建立的模块的功能你不得不写下相应的LoadModule行在这里，以便于在你能够使用这些模块中的指令。静态编译模块（在命令httpd -l下列出的)不需要再这里加载。
 示例：LoadModule foo_module modules/mod_foo.so
+
+----------
 
 #
 LoadModule access_compat_module modules/mod_access_compat.so
@@ -363,7 +379,11 @@ DocumentRoot "E:/svn/trunk/MoliServer30/api/public"
 
 可以作为这条指令的可能的值为："None", "All"或者任何以下的结合：包括FollowSymLinks SymLinksifOwnerMatch ExecCGI MultiViews索引。
 注意：MultiViews必须被明确的定义为Options All从而不将它给你。这里的配置为Options Indexes FollowSymLinks Includes ExecCGI。Options指令既复杂又重要，请查看http://httpd.apache.org/docs/2.4/mod/core.html#options以获得更多信息
-说明：
+说明：Options：配置在特定目录使用哪些特性，常用的值和基本含义如下：
+ExecCGI: 在该目录下允许执行CGI脚本。
+FollowSymLinks: 在该目录下允许文件系统使用符号连接。
+Indexes: 当用户访问该目录时，如果用户找不到DirectoryIndex指定的主页文件(例如index.html),则返回该目录下的文件列表给用户。
+SymLinksIfOwnerMatch: 当使用符号连接时，只有当符号连接的文件拥有者与实际文件的拥有者相同时才可以访问。
 
 ----------
 
@@ -382,17 +402,27 @@ DocumentRoot "E:/svn/trunk/MoliServer30/api/public"
     #
     Require all granted
 
+----------
+
 AllowOverride指令控制着那些指令可以被写入.htaccess文件。可能值为："All", "None"或者任何关键词的组合：AllowOverride FileInfo AuthConfig Limit
 这里的配置为：AllowOverride All
 
 此命令控制着谁能够从此服务器获得东西，这里的配置为Require all granted
+说明：AllowOverride：允许存在于.htaccess文件中的指令类型(.htaccess文件名是可以改变的，其文件名由AccessFileName指令决定)：
+None: 当AllowOverride被设置为None时。不搜索该目录下的.htaccess文件（可以减小服务器开销）。
+All: 在.htaccess文件中可以使用所有的指令。
+----------
 
 </Directory>
 <IfModule alias_module>
   Alias /api "E:/svn/trunk/MoliServer30/api/public"
 </IfModule>
 
+----------
+
 如果加载了alias_module模块，那么别名为/api "E:/svn/trunk/MoliServer30/api/public"
+
+----------
 
 #
 # DirectoryIndex: sets the file that Apache will serve if a directory
@@ -404,10 +434,14 @@ AllowOverride指令控制着那些指令可以被写入.htaccess文件。可能�
                    home.php home.pl home.cgi home.asp home.shtml home.html home.htm
 </IfModule>
 
+----------
+
 DirectoryIndex：设置如果请求了一个目录，apache提供的文件
 如果dir_module模块被加载了，那么 DirectoryIndex包括：index.php index.pl index.cgi index.asp index.shtml index.html index.htm \
                    default.php default.pl default.cgi default.asp default.shtml default.html default.htm \
                    home.php home.pl home.cgi home.asp home.shtml home.html home.htm
+
+----------
 
 #
 # The following lines prevent .htaccess and .htpasswd files from being 
@@ -417,7 +451,11 @@ DirectoryIndex：设置如果请求了一个目录，apache提供的文件
     Require all denied
 </Files>
 
+----------
+
 下面的这条命令可以阻止网络客户端访问.htaccess 和 .htpasswd 文件
+
+----------
 
 #
 # ErrorLog: The location of the error log file.
@@ -428,8 +466,13 @@ DirectoryIndex：设置如果请求了一个目录，apache提供的文件
 #
 ErrorLog "logs/error.log"
 
+----------
+
 错误日志：错误日志的存放地址。如果你没有再<VirtualHost>块中指出特定的错误日志地址，关于virtual host的错误信息将会被记录在这里。如果你确实为<VirtualHost>块定义了一个错误记录文件，那么那台虚拟主机的错误日子将会被记载在那里而不是这里。
 这里的配置为：ErrorLog "logs/error.log"
+说明：错误日志的保存位置
+
+----------
 
 #
 # LogLevel: Control the number of messages logged to the error_log.
@@ -438,7 +481,12 @@ ErrorLog "logs/error.log"
 #
 LogLevel warn
 
+----------
+
 LogLevel:控制被记录到错误日志的错误信息级别。可能的值有：debug, info, notice, warn, error, crit,alert, emerg.这里的配置为：LogLevel warn
+说明：被记录的错误的级别
+
+----------
 
 <IfModule log_config_module>
     #
@@ -469,12 +517,31 @@ LogLevel:控制被记录到错误日志的错误信息级别。可能的值有�
     CustomLog "logs/access.log" combined
 </IfModule>
 
+----------
+
 如果加载了log_config_module模块，下面的指令定义了一些能够在客户日志中使用的格式化的别名（查看一下内容）：
 这里的配置为：LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
     LogFormat "%h %l %u %t \"%r\" %>s %b" common
 如果同时加载了logio_module模块，你需要开启mod_logio.c以使用%I 和 %O。此处的配置为LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio。
 关于连接的日志文件的地址和格式。如果你没有在<VirtualHost>块中定义任何的关于连接的日志文件，那么他们将会被记录在这里。反之，如果你确实为<VirtualHost>块定义了一个错误记录文件，那么那台虚拟主机的错误日子将会被记载在那里而不是这里。
 CustomLog "logs/access.log" common，如果你偏好一个记录access, agent, and referer的日志文件（整合文件格式），你可以使用下面这条指令。CustomLog "logs/access.log" combined
+说明：
+格式中的各个参数如下：
+%h –客户端的ip地址或主机名
+%l –The 这是由客户端 identd 判断的RFC 1413身份，输出中的符号 "-" 表示此处信息无效。
+%u –由HTTP认证系统得到的访问该网页的客户名。有认证时才有效，输出中的符号 "-" 表示此处信息无效。
+%t –服务器完成对请求的处理时的时间。
+"%r" –引号中是客户发出的包含了许多有用信息的请求内容。
+%>s –这个是服务器返回给客户端的状态码。
+%b –最后这项是返回给客户端的不包括响应头的字节数。
+"%{Referer}i" –此项指明了该请求是从被哪个网页提交过来的。
+"%{User-Agent}i" –此项是客户浏览器提供的浏览器识别信息。
+下面是一段访问日志的实例：
+192.168.10.22 – bearzhang [10/Oct/2005:16:53:06 +0800] "GET /download/ HTTP/1.1" 200 1228
+192.168.10.22 – - [10/Oct/2005:16:53:06 +0800] "GET /icons/blank.gif HTTP/1.1" 304 -
+192.168.10.22 – - [10/Oct/2005:16:53:06 +0800] "GET /icons/back.gif HTTP/1.1" 304 -
+
+----------
 
 <IfModule alias_module>
     #
@@ -507,11 +574,15 @@ CustomLog "logs/access.log" common，如果你偏好一个记录access, agent, a
 
 </IfModule>
 
+----------
+
 如果加载了alias_module模块，
 Redirect:允许你告知浏览器通常存放在这里的访问稳定不在放在这里了而放在了别处。客户端将会建立一个到新的地址的新的请求以。示例：Redirect permanent /foo http://www.example.com/bar，这个还是永久重定向。
 Alias:指定网络路径到文件系统路径，并且此文件路径通常不在网站文档目录下。示例：Alias /webpath /full/filesystem/path
 如果你在/webpath后面加上了斜线/，那么服务器也要求在url地址中包含这个斜线。你可能还要提供一个<Directory>部分来指定允许连接到此文件系统目录。
 ScriptAlias:这个选项控制哪些目录包含服务器脚本。ScriptAliases本质上与Aliases选项相同。除了目录里的文档被客户端访问时被当做应用来运行而不是被当做文档发送到客户端。关于尾随的/的规则与上面的相同。这里的配置为：ScriptAlias /cgi-bin/ "D:/xampp/cgi-bin/"
+
+----------
 
 <IfModule cgid_module>
     #
@@ -521,9 +592,13 @@ ScriptAlias:这个选项控制哪些目录包含服务器脚本。ScriptAliases�
     #Scriptsock cgisock
 </IfModule>
 
+----------
+
 如果加载了cgid_module模块，
 ScriptSock:在线程服务器上，为了与mod_cgid的CGI程序进行交流而指定的路径
 示例配置：Scriptsock cgisock
+
+----------
 
 #
 # "D:/xampp/cgi-bin" should be changed to whatever your ScriptAliased
@@ -535,7 +610,11 @@ ScriptSock:在线程服务器上，为了与mod_cgid的CGI程序进行交流而�
     Require all granted
 </Directory>
 
+----------
+
 D:/xampp/cgi-bin应该被改为ScriptAliased CGI目录存在的地方，如果你有那个配置项的话
+
+----------
 
 <IfModule mime_module>
     #
@@ -585,6 +664,8 @@ D:/xampp/cgi-bin应该被改为ScriptAliased CGI目录存在的地方，如果�
     AddOutputFilter INCLUDES .shtml
 </IfModule>
 
+----------
+
 如果加载了mime_module模块，
 TypesConfig指定了文件扩展名到MIME-type的包含在映射列表中的文件的映射关系，这里的配置为TypesConfig conf/mime.types
 AddType允许你为在TypesConfig中特定的文件类型增加和重写MIME配置文件，配置实例：AddType application/x-gzip .tgz。
@@ -597,6 +678,7 @@ AddHandler允许你映射特定扩展名的文件的到指定的handlers：操�
 Filters允许你在将内容发送到浏览器之前process content它。
 为了在服务器端解析.shtml文件（你还要将Includes增加到Options指令），这里的配置为：AddType text/html .shtml，AddOutputFilter INCLUDES .shtml
 
+----------
 
 #
 # The mod_mime_magic module allows the server to use various hints from the
