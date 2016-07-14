@@ -182,25 +182,39 @@ namespace _10
         }
     }
    */
-   /*
-    class Constants
+    /*
+     class Constants
+     {
+         public const int A = 1;
+         public const int B = A + 1;
+     }
+     class Test
+     {
+         static void Main()
+         {
+             Constants con = new Constants();
+             Console.WriteLine("常数A的值为{0}",Constants.A);
+             Console.WriteLine("常数B的值为{0}", Constants.B);
+             Thread.Sleep(10000);
+
+         }
+     }
+     */
+     /*
+    class Button
     {
-        public const int A = 1;
-        public const int B = A + 1;
+        public string caption="fafa";
     }
     class Test
     {
         static void Main()
         {
-            Constants con = new Constants();
-            Console.WriteLine("常数A的值为{0}",Constants.A);
-            Console.WriteLine("常数B的值为{0}", Constants.B);
+            Button btn = new Button();
+            Console.WriteLine(btn.caption);
             Thread.Sleep(10000);
-
         }
     }
     */
-
 
 
    
