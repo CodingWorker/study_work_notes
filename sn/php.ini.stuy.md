@@ -20,6 +20,9 @@ PHP的初始化文件，通常称为php.ini,负责PHP行为的许多方面的配
   18 ; Windows directory (C:\windows or C:\winnt)
   19 ; See the PHP docs for more specific information.
   20 ; http://php.net/configuration.file
+
+----------
+
 PHP尝试查找和载入这个配置文件从多个地址，下面的是它查找顺序的一个简介：
 1.SAPI模块特殊路径
 2.PHP运行时配置的环境变量
@@ -29,12 +32,20 @@ PHP尝试查找和载入这个配置文件从多个地址，下面的是它查�
 5.windows目录（如C:\windows or C:\winnt)
 6.查看PHP文档查看更多的信息
 
+----------
+
   21 
   22 ; The syntax of the file is extremely simple.  Whitespace and lines
   23 ; beginning with a semicolon are silently ignored (as you probably guessed).
   24 ; Section headers (e.g. [Foo]) are also silently ignored, even though
   25 ; they might mean something in the future.
+
+----------
+
 这份文件的语法极其的简单，以分号开头的空格键和空白行会被忽略（可能正如你猜的那样），章节标题（例如[Foo])也会被忽略，尽管未来他们可能有某种含义
+
+----------
+
   26 
   27 ; Directives following the section heading [PATH=/www/mysite] only
   28 ; apply to PHP files in the /www/mysite directory.  Directives
@@ -44,10 +55,16 @@ PHP尝试查找和载入这个配置文件从多个地址，下面的是它查�
   32 ; at runtime. Currently, [PATH=] and [HOST=] sections only work under
   33 ; CGI/FastCGI.
   34 ; http://php.net/ini.sections
+
+----------
+
 章节标题[PATH=/www/mysite]下的指南/说明/配置只适用于/www/mysite目录下的php文件。
 章节标题[HOST=www.example.com]下的指南/说明/配置只适用于服务于www.example.com的php文件。
 在这些特殊的章节部分的指令/说明/配置不能在PHP运行期间被用户自定义的ini配置文件重写或覆盖。
 目前，[PATH=] and [HOST=]章节部分只能在CGI或FASTCGI下工作
+
+----------
+
   35 
   36 ; Directives are specified using the following syntax:
   37 ; directive = value
@@ -55,14 +72,26 @@ PHP尝试查找和载入这个配置文件从多个地址，下面的是它查�
   39 ; Directives are variables used to configure PHP or PHP extensions.
   40 ; There is no name validation.  If PHP can't find an expected
   41 ; directive because it is not set or is mistyped, a default value will be used.
+
+----------
+
 专门指令使用了下面的语法：
-指令=值 的形式，指令名字是大小写敏感的，如foo=bar与FOO=bar是不同的，指令是用来配置PHP或者PHP扩展的变量，这没有名字确认（即名字验证是否是PHP配置变量名），如果因为没有被设置值或者输入指令错误导致PHP不能找到期望的指令时，PHP将会使用默认的值
+指令=值 的形式，指令名字是大小写敏感的，如foo=bar与FOO=bar是不同的，指令是用来配置PHP或者PHP扩展的变量，在这里没有名字确认（即名字验证是否是PHP配置变量名），如果因为没有被设置值或者输入指令错误导致PHP不能找到期望的指令时，PHP将会使用该选项的默认值
+
+----------
+
   42 
   43 ; The value can be a string, a number, a PHP constant (e.g. E_ALL or M_PI), one
   44 ; of the INI constants (On, Off, True, False, Yes, No and None) or an expression
   45 ; (e.g. E_ALL & ~E_NOTICE), a quoted string ("bar"), or a reference to a
   46 ; previously set variable or directive (e.g. ${foo})
+
+----------
+
 值可以是字符串、数字、PHP常量（如E_ALL 或者 M_PI）、任何一个ini配置常量（如On, Off, True, False, Yes, No and None）或者一个表达式（如E_ALL & ~E_NOTICE），一个被括号括起来的字符串（如"bar"）或者一个代表之前设置的变量或者指令的表达式（如${foo}）
+
+----------
+
   47 
   48 ; Expressions in the INI file are limited to bitwise operators and parentheses:
   49 ; |  bitwise OR
@@ -70,16 +99,28 @@ PHP尝试查找和载入这个配置文件从多个地址，下面的是它查�
   51 ; &  bitwise AND
   52 ; ~  bitwise NOT
   53 ; !  boolean NOT
+
+----------
+
 ini文件中的表达式被限制为按位操作和**括号**
 |  bitwise OR  按位或
 ^  bitwise XOR  按位异或
 &  bitwise AND  按位与
 ~  bitwise NOT  按位非
 !  boolean NOT  布尔操作非
+
+----------
+
   54 
   55 ; Boolean flags can be turned on using the values 1, On, True or Yes.
   56 ; They can be turned off using the values 0, Off, False or No.
+
+----------
+
 布尔标志正确可以使用值1 On True或者Yes,布尔标志错误可以使用值0 Off False 或者No
+
+----------
+
   57 
   58 ; An empty string can be denoted by simply not writing anything after the equal
   59 ; sign, or by using the None keyword:
@@ -87,15 +128,27 @@ ini文件中的表达式被限制为按位操作和**括号**
   61 ;  foo =         ; sets foo to an empty string
   62 ;  foo = None    ; sets foo to an empty string
   63 ;  foo = "None"  ; sets foo to the string 'None'
+
+----------
+
 等号标志后面不写内容或者使用关键字None可以被解释为空字符串，如
-foo =         ; sets foo to an empty string
-foo = None    ; sets foo to an empty string
-foo = "None"
+foo =         ; sets foo to an empty string   将foo设置为空字符串
+foo = None    ; sets foo to an empty string   将foo设置为空字符串
+foo = "None"     将foo设置为字符串None
+
+----------
+
   64 
   65 ; If you use constants in your value, and these constants belong to a
   66 ; dynamically loaded extension (either a PHP extension or a Zend extension),
   67 ; you may only use these constants *after* the line that loads the extension.
+
+----------
+
 如果你在值中使用常量，而且这些常量属于PHP的一个动态加载扩展（无论是PHP扩展或者zend扩展）你可能只能够在加载了这些扩展之后才能使用扩展中的这些常量
+
+----------
+
   68 
   69 ;;;;;;;;;;;;;;;;;;;
   70 ; About this file ;
@@ -103,23 +156,47 @@ foo = "None"
   72 ; PHP comes packaged with two INI files. One that is recommended to be used
   73 ; in production environments and one that is recommended to be used in
   74 ; development environments.
+
+----------
+
 关于本文件
 PHP包包含两个ini文件，一个被推荐在生产环境下使用，另一个推荐在开发环境下使用
+
+----------
+
   75 
   76 ; php.ini-production contains settings which hold security, performance and
   77 ; best practices at its core. But please be aware, these settings may break
   78 ; compatibility with older or less security conscience applications. We
   79 ; recommending using the production ini in production and testing environments.
+
+----------
+
 适合生产环境的php.ini文件包含了多项设置，以安全、效率和最好的实践作为它的核心，但请注意，这些设置也许会在与旧版本或者不安全的应用不兼容，我们强烈建议在生产和测试环境下使用适合生产环境的配置文件
+
+----------
+
   80 
   81 ; php.ini-development is very similar to its production variant, except it is
   82 ; much more verbose when it comes to errors. We recommend using the
   83 ; development version only in development environments, as errors shown to
   84 ; application users can inadvertently leak otherwise secure information.
+
+----------
+
 适用于开发坏境的php.ini文件与生产环境下的配置文件相似，除了当涉及到错误处理时显得更加的冗长啰嗦。我们建议仅仅在开发环境下使用开发版本配置，因为如果错误显示给应用使用者会不经意的泄露其他的安全信息
+
+----------
+
   85 
   86 ; This is php.ini-production INI file.
+
+----------
+
 这是适用于生产环境下的PHP配置文件
+
+----------
+
   87 
   88 ;;;;;;;;;;;;;;;;;;;
   89 ; Quick Reference ;
@@ -128,7 +205,13 @@ PHP包包含两个ini文件，一个被推荐在生产环境下使用，另一�
   92 ; or development versions of the INIs with respect to PHP's default behavior.
   93 ; Please see the actual settings later in the document for more details as to why
   94 ; we recommend these changes in PHP's behavior.
+
+----------
+
 快速指南：下面的是所有的配置，考虑到PHP的默认行为，这些配置在开发版本（适用于开发环境的php.ini）和生产版本（适用于生产环境的php.ini）都不同，至于为什么我们推荐PHP行为的这些改变，请查看文档中接下来的实际配置以了解更多的信息
+
+----------
+
   95 
   96 ; display_errors
   97 ;   Default Value: On
@@ -210,19 +293,33 @@ PHP包包含两个ini文件，一个被推荐在生产环境下使用，另一�
  173 ;;;;;;;;;;;;;;;;;;;;
  174 ; Name for user-defined php.ini (.htaccess) files. Default is ".user.ini"
  175 ;user_ini.filename = ".user.ini"
+
 php.ini选项
 设置用户自定义的配置文件名，默认的命名为.user.ini，
 user_ini.filename = ".user.ini"
+
  176 
  177 ; To disable this feature set this option to empty value
  178 ;user_ini.filename =
+
+----------
+
 为了禁止这个特性，需要将选项值设置为空，如
 user_ini.filename =
+
+----------
+
  179 
  180 ; TTL for user-defined php.ini files (time-to-live) in seconds. Default is 300 seconds (5 minutes)
  181 ;user_ini.cache_ttl = 300
+
+----------
+
 TTL是用来设置用户自定义的文件的存在周期，默认的为300秒，设置如
 user_ini.cache_ttl = 300
+
+----------
+
  182 
  183 ;;;;;;;;;;;;;;;;;;;;
  184 ; Language Options ;
@@ -232,8 +329,14 @@ user_ini.cache_ttl = 300
  187 ; Enable the PHP scripting language engine under Apache.
  188 ; http://php.net/engine
  189 engine = On
+
+----------
+
 在apache引擎下开启PHP脚本语言，参考http://php.net/engine，设置如：
 engine = On
+
+----------
+
  190 
  191 ; This directive determines whether or not PHP will recognize code between
  192 ; <? and ?> tags as PHP source which should be processed as such. It is
@@ -247,14 +350,25 @@ engine = On
  200 ; Production Value: Off
  201 ; http://php.net/short-open-tag
  202 short_open_tag = Off
+
+----------
+
 这个指令决定是否将<? 和 ?>标签之间的代码识别为PHP代码来执行，通常建议<?php 和 ?>标签应该被使用，因此那个功能（即将<?和?>识别为php标识符）应该被禁止。开启这个功能可能在生成xml文档时导致问题产生。然而因为后向兼容的原因这仍然被支持。注意：这条指令不包含<?=短标签，无论这个指令怎么设置<?=都可以使用（但我试了却不能使用）
+
+----------
 
  203 
  204 ; The number of significant digits displayed in floating point numbers.
  205 ; http://php.net/precision
  206 precision = 14
+
+----------
+
 这个数字指定了浮点数最多显示的数字个数，参考http://php.net/precision
 precision = 14 表明当表示浮点数时最多显示14个数字
+
+----------
+
  207 
  208 ; Output buffering is a mechanism for controlling how much output data
  209 ; (excluding headers and cookies) PHP should keep internally before pushing that
@@ -279,7 +393,10 @@ precision = 14 表明当表示浮点数时最多显示14个数字
  228 ; Production Value: 4096
  229 ; http://php.net/output-buffering
  230 output_buffering = 4096
-输出缓存机制是为了控制在将数据发送到客户端之前PHP应该在内部保存多少内容（不包括headers和cookies），如果你的应用输出超过了这个设置，PHP将会大致按照你指定的大小分块发送数据。开启这个配置并设置缓冲的大小会产生一些有趣的副作用，这依赖于应用和服务器。你也许能够通过print和echo在发送完数据之后发送headers和cookies，你也可以在服务器仅发送了少量数据时看到这个设置的优势地方，因为在PHP的输出数据时输出缓冲将那个内容截获了
+
+----------
+
+输出缓存机制是为了控制在将数据发送到客户端之前PHP应该在内部保存多少内容（不包括headers和cookies），如果你的应用输出超过了这个设置，PHP将会大致按照你指定的大小分块发送数据。开启这个配置并设置缓存的大小会产生一些有趣的副作用，这依赖于应用和服务器。设置了输出缓存你也许能够通过print和echo在发送完数据之后发送headers和cookies，你也可以在服务器仅发送了少量数据时看到这个设置的优势地方，因为在PHP输出数据时输出缓冲将那个内容截获了。
 在生产服务器上，4096比特是一个因为性能原因的一个较好的配置。
 注意：输出缓冲也可以通过输出缓冲函数来控制，可能的配置值为：
 On代表开启缓冲输出，并且缓存大小无限制
@@ -291,6 +408,9 @@ Development Value: 4096
 Production Value: 4096
 http://php.net/output-buffering
 output_buffering = 4096
+
+----------
+
  231 
  232 ; You can redirect all of the output of your scripts to a function.  For
  233 ; example, if you set output_handler to "mb_output_handler", character
@@ -306,9 +426,15 @@ output_buffering = 4096
  243 ;   Instead you must use zlib.output_handler.
  244 ; http://php.net/output-handler
  245 ;output_handler =
-你可以重定向你的脚本的所有的输出到一个函数。例如，如果你设置了output_handler为mb_output_handler，字符编码将会被自动转换为指定的编码，如果设置了output handler则自动开启output buffering。注意：书写轻便的脚本的开发人员不能依赖于这条指令。相反，应该显示的使用ob_start()来设置output handler。使用这条ini配置指令可能会导致一些问题除非你确切的知道脚本正在执行什么。
+
+----------
+
+你可以重定向你的脚本的所有的输出到一个函数。例如，如果你设置了output_handler为mb_output_handler，字符编码将会被自动转换为指定的编码，如果设置了output handler，则自动开启output buffering。注意：书写可移植的脚本的开发人员不能依赖于这条指令。相反，应该显示的使用ob_start()来设置output handler。使用这条ini配置指令可能会导致一些问题除非你确切的知道脚本正在执行什么。
 注意：你不能同时使用mb_output_handler和ob_iconv_handler；你也不能同时使用ob_gzhandler和zlib.output_compression。注意：如果开启这条指令，那么output_handler必须被设置为空，相反你必须使用zlib.output_handler，参考：http://php.net/output-handler
 output_handler =
+
+----------
+
  246 
  247 ; Transparent output compression using the zlib library
  248 ; Valid values for this option are 'off', 'on', or a specific buffer size
@@ -321,11 +447,17 @@ output_handler =
  255 ;   output_handler, or otherwise the output will be corrupted.
  256 ; http://php.net/zlib.output-compression
  257 zlib.output_compression = Off
+
+----------
+
 显示的输出压缩使用的是zlib库，这个选项的有效的值是off和on或者一个指定被用来压缩的缓冲大小（默认为4kb），
 注意： Resulting chunk的大小与实际的压缩有关，作为压缩的每一个PHP输出chunks为几百byte
 如果你为了追求性能偏好一个更大的chunk大小的话，要额外开启output_buffering
 注意：你需要使用zlib.output_handler而不是标准的output_handler，否则输出将会被破坏，参考http://php.net/zlib.output-compression
 zlib.output_compression = Off
+
+----------
+
  258 
  259 ; http://php.net/zlib.output-compression-level
  260 ;zlib.output_compression_level = -1
@@ -337,7 +469,13 @@ zlib.output_compression_level = -1
  264 ; a different order.
  265 ; http://php.net/zlib.output-handler
  266 ;zlib.output_handler =
+
+----------
+
 如果开启zlib.output_compression，你不能指定其他的output handlers。这个配置与output_handler的功能形同，除了以一种不同的顺序/命令
+
+----------
+
  267 
  268 ; Implicit flush tells PHP to tell the output layer to flush itself
  269 ; automatically after every output block.  This is equivalent to calling the
@@ -347,9 +485,14 @@ zlib.output_compression_level = -1
  273 ; http://php.net/implicit-flush
  274 ; Note: This directive is hardcoded to On for the CLI SAPI
  275 implicit_flush = Off
+
+----------
+
 内含的flush使得PHP告诉输出层以便在每次输出块后自动地flush他自己。这相当于在每一次调用print() 或者echo()和HTML块后调用PHP的内置函数flush(),开启这个配置有严重的性能影响并且推荐仅仅在为了debugging开启，参考：http://php.net/implicit-flush
 注意：在the CLI SAPI情况下这条指令被硬编码为开启
 implicit_flush = Off
+
+----------
 
  276 
  277 ; The unserialize callback function will be called (with the undefined class'
@@ -360,8 +503,12 @@ implicit_flush = Off
  282 ; callback-function.
  283 unserialize_callback_func =
 
+----------
+
 如果反序列化器发现一个对象实例化一个未定义的类，反序列化回调函数将会被调用，并将未定义的类名作为参数。如果这个特定的回调函数没有被定义或者函数没有将未定义的类include，将在浏览器中出现警告。因此，如果你真的想执行那样一个回调函数仅需要设置此项。
 unserialize_callback_func =
+
+----------
 
  284 
  285 ; When floats & doubles are serialized store serialize_precision significant
@@ -372,9 +519,13 @@ unserialize_callback_func =
  290 ; precision.
  291 serialize_precision = -1
 
+----------
+
 当floats和doubles数被序列化存储，serialize_precision指明了在小数点后的数字个数。默认值保证当存储的floats值被反序列化时数字前后数字能够一致。当编码double values数据时这个值也可以用于json_encode()
 如果设置为-1，那么dtoa mode 0被使用，这将自动地选择最精确地方法
 serialize_precision = -1
+
+----------
 
  292 
  293 ; open_basedir, if set, limits all file operations to the defined directory
@@ -383,16 +534,26 @@ serialize_precision = -1
  296 ; http://php.net/open-basedir
  297 ;open_basedir =
 
-如果设置了open_basedir，那么就将所有的文件操作都限制在了指定的目录及之下。如果在一个单一目录或者单一虚拟主机网路服务器下，这条指令会产生很大的作用如果----其实就是限制了操作文件的空间，除了指定的文件目录及之下目录之外都不能操作，以免产生安全问题
+----------
+
+如果设置了open_basedir，那么就将所有的文件操作都限制在了指定的目录及之下。如果在一个单一目录或者单一虚拟主机网路服务器下，这条指令会产生很大的作用效果----其实就是限制了操作文件的空间，除了指定的文件目录及之下目录之外都不能操作，以免产生安全问题
 open_basedir =
+说明：用open_basedir指定的限制实际上是前缀，不是目录名。也就是说"/dir/incl"将允许访问"/dir/include"和"/dir/incls"，如果您希望将访问控制在一个指定的目录，那么请在结尾加上一个斜线，例如："/dir/incl/"。默认是允许打开所有文件。
+
+----------
 
  298 
  299 ; This directive allows you to disable certain functions for security reasons.
  300 ; It receives a comma-delimited list of function names.
  301 ; http://php.net/disable-functions
  302 disable_functions =
+
+----------
+
 这条指令允许你处于一些安全的考虑禁用某些特定的函数。这条指令需要一个逗号分隔的函数名的list,参考：http://php.net/disable-functions，（译注：如禁用print_r,注意：echo是语法结构，不能禁用）
 disable_functions ='print_r'
+
+----------
 
  303 
  304 ; This directive allows you to disable certain classes for security reasons.
@@ -400,7 +561,11 @@ disable_functions ='print_r'
  306 ; http://php.net/disable-classes
  307 disable_classes =
 
+----------
+
 与上面类似，禁用类
+
+----------
 
  308 
  309 ; Colors for Syntax Highlighting mode.  Anything that's acceptable in
@@ -412,12 +577,16 @@ disable_functions ='print_r'
  315 ;highlight.default = #0000BB
  316 ;highlight.html    = #000000
 
+----------
+
 语法高亮模式的颜色设置。任何能够用于span标签style属性颜色值都能够用在这里，参考：http://php.net/syntax-highlighting
 highlight.string  = #DD0000
 highlight.comment = #FF9900
 highlight.keyword = #007700
 highlight.default = #0000BB
 highlight.html    = #000000
+
+----------
 
  317 
  318 ; If enabled, the request will be allowed to complete even if the user aborts
@@ -427,8 +596,12 @@ highlight.html    = #000000
  322 ; http://php.net/ignore-user-abort
  323 ;ignore_user_abort = On
 
-如果该配置项被开启，则即使用户取消了请求请求将被允许完成。考虑如果执行长请求，这个请求可能被用户取消而打断或者因为超过了浏览器运行时间而被打断，因此开启它。PHP的默认的行为禁用了这个特性，参考：http://php.net/ignore-user-abort
+----------
+
+如果该配置项被开启，则即使用户取消了请求，请求将被允许完成。考虑如果执行长请求，这个请求可能被用户取消而打断或者因为超过了浏览器运行时间而被打断，因此开启它。PHP的默认的行为禁用了这个特性，参考：http://php.net/ignore-user-abort
 ignore_user_abort = On
+
+----------
 
  324 
  325 ; Determines the size of the realpath cache to be used by PHP. This value should
@@ -437,9 +610,13 @@ ignore_user_abort = On
  328 ; http://php.net/realpath-cache-size
  329 ;realpath_cache_size = 16k
 
+----------
+
 该配置项决定了被PHP使用的存储绝对路径的缓存大小。当在系统中PHP打开许多文件影响到文件操作的性能时这个值应该增加。参考：http://php.net/realpath-cache-size
 realpath_cache_size = 16k
 PHP除了操作相对路径外也会操作绝对路径，如果开启了这个缓存，那么PHP就会非常迅速的操作之前操作过的文件。
+
+----------
 
  330 
  331 ; Duration of time, in seconds for which to cache realpath information for a given
@@ -530,6 +707,8 @@ PHP的版本号暴露无疑，攻击者很容易捕获到此信息，要想解�
  391 ; http://php.net/memory-limit
  392 memory_limit = 128M
 
+----------
+
 资源控制
 每一个脚本的最大执行时间，以秒为单位，参考：http://php.net/max-execution-time，注意：在CLI SAPI情况下这一指令被硬编码为0
 max_execution_time = 30
@@ -550,6 +729,14 @@ max_input_vars = 1000
 
 一个脚本可能消耗的最大内存，参考：http://php.net/memory-limit
 memory_limit = 128M
+说明： 设定一个脚本所能够申请到的最大内存字节数。
+这有助于防止劣质脚本消耗完服务器上的所有内存。
+要使用此指令必须在编译的时候激活。
+因此 configure 一行中应该包括：--enable-memory-limit
+如果不需要任何内存上的限制，必须将其设为 -1
+自php4.3.2 起，当设置了memory_limit后，memory_get_usage()函数将变为可用
+
+----------
 
  393 
  394 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -571,9 +758,13 @@ memory_limit = 128M
  410 ; means it pretty much reports everything which is exactly what you want during
  411 ; development and early testing.
 
+----------
+
 错误处理和日志
-这条指令使得你告诉PHP那些错误、警告、注意需要采取适当的处理。建议通过使用错误等级常量和按位操作符为这条指令设置值。下面给出了错误等级常量，为了方便还给出了通常的设置方式和他们的含义。默认情况下，PHP会对所有的错误、警告和注意采取适当的操作，除了那些与E_NOTICE和E_STRICT相关的。这些配置使得PHP表现良好并且建议使用PHP进行标准的编辑。为了性能的原因，这是推荐的错误报告配置，你的生产情况下服务器不应该在好的做法和标准的编码方面浪费资源。那是开发阶段服务器和开发阶段配置需要做的事情。
+这条指令使得你告诉PHP哪些错误、警告、注意需要采取适当的处理。建议通过使用错误等级常量和按位操作符为这条指令设置值。下面给出了错误等级常量，为了方便还给出了通常的设置方式和他们的含义。默认情况下，PHP会对所有的错误、警告和注意采取适当的操作，除了那些与E_NOTICE和E_STRICT相关的。这些配置使得PHP表现良好并且建议使用PHP进行标准的编辑。为了性能的原因，这是推荐的错误报告配置，你的生产情况下服务器不应该在好的做法和标准的编码方面浪费资源。那是开发阶段服务器和开发阶段配置需要做的事情。
 注意：php.ini开发版文件将此项设置为E_ALL。这意味着它非常好的和多的报道了所有在开发和测试阶段你想要的东西。
+
+----------
 
  412 ;
  413 ; Error Level Constants:
@@ -609,9 +800,9 @@ E_RECOVERABLE_ERROR  - 几乎执行的运行阶段错误
 E_WARNING         - 运行阶段警告 (non-fatal errors)
 E_PARSE           - 编译阶段 解析错误
 E_NOTICE          - 运行阶段notes,这些也是警告，通常是源自于代码的bug，但是他可能是故意的，例如使用了未经初始化的变量以为这样会自动初始化为一个空字符串，而PHP实际并不会自动初始化
-E_STRICT          - 运行阶段 notices, 可以获得PHP更改建议，这将能够保证好的交互性和代码的兼容性
-E_CORE_ERROR      - 在PHP初始化阶段产生的致命作物
-E_CORE_WARNING    - 在PHP初始化阶段产生警告而非致命错误
+E_STRICT          - 编码标准化警告, 可以获得PHP更改建议，这将能够保证好的交互性和代码的兼容性
+E_CORE_ERROR      - 在PHP启动时初始化阶段产生的致命作物
+E_CORE_WARNING    - 在PHP启动时初始化阶段产生警告而非致命错误
 E_COMPILE_ERROR   - 致命的编译错误
 E_COMPILE_WARNING - 编译阶段产生的警告而非致命错误
 E_USER_ERROR      - 用户自己生成的错误信息
@@ -642,6 +833,7 @@ E_COMPILE_ERROR|E_RECOVERABLE_ERROR|E_ERROR|E_CORE_ERROR  (只显示错误)
 生产阶段值：E_ALL & ~E_DEPRECATED & ~E_STRICT
 参考：http://php.net/error-reporting
 error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT，这个是当前设置
+说明：当前的配置为报告所有的错误除了函数被放弃和编码标准化错误。
 
  449 
  450 ; This directive controls whether or not and where PHP will output errors,
@@ -661,7 +853,9 @@ error_reporting = E_ALL & ~E_DEPRECATED & ~E_STRICT，这个是当前设置
  464 ; http://php.net/display-errors
  465 display_errors = Off
 
-这条指令控制PHP是否以及在哪里输出错误、notice/warning信息。在开发阶段输出错误非常有用，但是在生产环境输出错误信息则非常危险。这依赖于出发错误的代码，某些敏感信息可能会潜在的泄露到你的应用，如数据库用户名和密码或者更糟糕。在生产环境下，我们建议日志记录错误信息而不是将他们标准输出：
+----------
+
+这条指令控制PHP是否以及在哪里输出错误、notice/warning信息。在开发阶段输出错误非常有用，但是在生产环境输出错误信息则非常危险。这依赖于产生错误的代码，某些敏感信息可能会潜在的泄露到你的应用，如数据库用户名和密码或者更糟糕。在生产环境下，我们建议日志记录错误信息而不是将他们标准输出：
 可能的值：
 Off = 不显示任何错误信息
 stderr = 将错误显示到终端/文件 (仅仅影响CGI/CLI 文件!)
@@ -672,6 +866,8 @@ On or stdout = 输出错误信息到标准输出设备
  464 ; http://php.net/display-errors
  465 display_errors = Off
 默认值是开启的，即为On,开发环境下值为On,生产环境下值为Off,参考：http://php.net/display-errors，display_errors = Off，这是此配置的设置
+
+----------
 
  466 
  467 ; The display of errors which occur during PHP's startup sequence are handled
@@ -685,9 +881,14 @@ On or stdout = 输出错误信息到标准输出设备
  475 ; http://php.net/display-startup-errors
  476 display_startup_errors = Off
 
+----------
+
 显示错误信息发生在PHP的运行队列开始运行时。PHP的默认行为是抑制来自客户端浏览器的错误。开启显示错误配置在debug环境下非常的有用，我们强烈建议你在生产阶段关闭此配置
 默认值为：Off,开发阶段值为On,生产阶段值为Off,参考：http://php.net/display-startup-errors，这里配置为
 display_startup_errors = Off
+说明：这条指令是控制是否显示PHP启动时的错误的。
+
+----------
 
  477 
  478 ; Besides displaying errors, PHP can also log errors to locations such as a
@@ -700,8 +901,12 @@ display_startup_errors = Off
  485 ; http://php.net/log-errors
  486 log_errors = On
 
-除了显示错误，PHP也能够将错误记录到指定的服务器日子文件呢、标准文件或者下面error_log指令可以找到的路径。尽管在生产环境下错误不应该显示，但是服务器应该仍然能够监视并记录错误
+----------
+
+除了显示错误，PHP也能够将错误记录到指定的服务器日志文件里、标准文件或者下面error_log指令可以找到的路径。尽管在生产环境下错误不应该显示，但是服务器应该仍然能够监视并记录错误
 默认值为Off,开发环境下的值为Off,生产环境下的值为On,参考：http://php.net/log-errors，这里配置为：log_errors = On
+
+----------
 
  487 
  488 ; Set maximum length of log_errors. In error_log information about the source is
@@ -709,8 +914,12 @@ display_startup_errors = Off
  490 ; http://php.net/log-errors-max-len
  491 log_errors_max_len = 1024
 
+----------
+
 设置记录错误的最大长度。在错误日志信息中加入此项，默认的是1024，0表示不限制大小。参考：http://php.net/log-errors-max-len，这里的配置是
 log_errors_max_len = 1024
+
+----------
 
  492 
  493 ; Do not log repeated messages. Repeated errors must occur in same file on same
@@ -718,7 +927,11 @@ log_errors_max_len = 1024
  495 ; http://php.net/ignore-repeated-errors
  496 ignore_repeated_errors = Off
 
+----------
+
 不要记录重复的信息。记录重复的错误信息指的是在同一文件的同一行发生的错误除非将此配置项设置为true。参考：http://php.net/ignore-repeated-errors，这里的配置为ignore_repeated_errors = Off
+
+----------
 
  497 
  498 ; Ignore source of message when ignoring repeated messages. When this setting
@@ -727,7 +940,11 @@ log_errors_max_len = 1024
  501 ; http://php.net/ignore-repeated-source
  502 ignore_repeated_source = Off
 
-当忽略了重复信息时忽略信息的源。当这个配置被开启，将不会记录不同的文件或不同行产生的重复信息，参考：http://php.net/ignore-repeated-source，这里的配置为ignore_repeated_source = Off
+----------
+
+当忽略了重复信息的同时忽略信息的源。当这个配置被开启，将不会记录不同的文件或不同行产生的重复信息，参考：http://php.net/ignore-repeated-source，这里的配置为ignore_repeated_source = Off
+
+----------
 
  503 
  504 ; If this parameter is set to Off, then memory leaks will not be shown (on
@@ -736,13 +953,21 @@ log_errors_max_len = 1024
  507 ; http://php.net/report-memleaks
  508 report_memleaks = On
 
+----------
+
 如果这里的配置设置为Off,那么内存泄露将不会显示在标准输出终端或者日志中。只有在debug编译下以及设置了error reporting includes E_WARNING情况下此配置项才会起作用，参考：http://php.net/report-memleaks，这里的配置为report_memleaks = On
+说明：这个参数只在调试编译中起作用，并且必须在错误报告中包含 E_WARNING
+----------
 
  509 
  510 ; This setting is on by default.
  511 ;report_zend_debug = 0
 
+----------
+
 默认的这项配置开启了，report_zend_debug = 0这个被注释了则是开启
+
+----------
 
  512 
  513 ; Store the last error/warning message in $php_errormsg (boolean). Setting this value
@@ -754,22 +979,34 @@ log_errors_max_len = 1024
  519 ; http://php.net/track-errors
  520 track_errors = Off
 
+----------
+
 在$php_errormsg中存储最后的错误和警告信息。开启这个配置项在debug和开发环境下有帮助。在生产环境下应该关闭
 默认值为Off,开发环境下为Off，生产环境下为On,参考：http://php.net/track-errors，这里的配置为track_errors = Off
+
+----------
 
  521 
  522 ; Turn off normal error reporting and emit XML-RPC error XML
  523 ; http://php.net/xmlrpc-errors
  524 ;xmlrpc_errors = 0
 
+----------
+
 关闭正常的错误报告，输出XML-RPC错误，参考：http://php.net/xmlrpc-errors，这里的配置是xmlrpc_errors = 0
+
+----------
 
  525 
  526 ; An XML-RPC faultCode
  527 ;xmlrpc_error_number = 0
 
+----------
+
 一个XML-RPC故障代码
 xmlrpc_error_number = 0
+
+----------
 
  528 
  529 ; When PHP displays or logs an error, it has the capability of formatting the
@@ -782,9 +1019,13 @@ xmlrpc_error_number = 0
  536 ; http://php.net/html-errors
  537 html_errors = On
 
+----------
+
 当PHP显示或者将一个错误计入了日志，它就有能力以html的格式来格式化错误信息以便于阅读。纸条指令控制错误信息是否以html格式来组织。注意：在CLI SAPI情况下这条指令被硬编码为Off。
 默认值为On,开发环境下为On,生产环境下为On,参考：http://php.net/html-errors，
 这配置为：html_errors = On
+说明：这条指令是为了控制当错误出生时渲染错误页面，如果设置为Off，则错误信息在html页面上不会有任何样式。
+----------
 
  538 
  539 ; If html_errors is set to On *and* docref_root is not empty, then PHP
@@ -803,9 +1044,13 @@ xmlrpc_error_number = 0
  552 ; http://php.net/docref-ext
  553 ;docref_ext = .html
 
+----------
+
 如果html_errors设置为On并且docref_root不为空，那么PHP产生出一个可以点击的错误信息用于点击后直接跳转到一个详细描述此错误或者导致此错误的函数的页面。你可以下载一份PHP手册的副本从http://php.net/docs，然后改变docref_root为你本地副本的基本url（包含最后的/）。你还必须指定特定的文件扩展名（包含.）。PHP的默认将这些值设置为空值，因此没有产生连接到文档的链接。
 注意：在生产环境下不要使用此特性。
 示例：docref_root = "/phpmanual/"，（参考：http://php.net/docref-ext）docref_ext = .html
+
+----------
 
  554 
  555 ; String to output before an error message. PHP's default behavior is to leave
@@ -814,8 +1059,12 @@ xmlrpc_error_number = 0
  558 ; Example:
  559 ;error_prepend_string = "<span style='color: #ff0000'>"
 
+----------
+
 在错误信息输出之前输出这里配置的字符串，PHP默认此配置项为空。参考：http://php.net/error-prepend-string
 示例：error_prepend_string = "<span style='color: #ff0000'>"
+
+----------
 
  560 
  561 ; String to output after an error message. PHP's default behavior is to leave
@@ -824,8 +1073,12 @@ xmlrpc_error_number = 0
  564 ; Example:
  565 ;error_append_string = "</span>"
 
+----------
+
 在错误信息输出之后输出这里配置的字符串，PHP默认此配置项为空。参考：http://php.net/error-prepend-string
 示例：error_append_string = "</span>"
+
+----------
 
  566 
  567 ; Log errors to specified file. PHP's default behavior is to leave this value
@@ -836,9 +1089,13 @@ xmlrpc_error_number = 0
  572 ; Log errors to syslog (Event Log on Windows).
  573 ;error_log = syslog
 
+----------
+
 记录错误信息到指定的文件。PHP默认此配置项为空，参考：http://php.net/error-log
 示例：error_log = php_errors.log
 记录错误信息到syslog (Event Log on Windows)，这样配置error_log = syslog
+
+----------
 
  574 
  575 ;windows.show_crt_warning
@@ -846,7 +1103,11 @@ xmlrpc_error_number = 0
  577 ; Development value: 0
  578 ; Production value: 0
 
+----------
+
 windows显示crt_warning警告，默认值为0，开发环境下为0，生产环境下为0
+
+----------
 
  579 
  580 ;;;;;;;;;;;;;;;;;
@@ -859,8 +1120,12 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  587 ; Example:
  588 ;arg_separator.output = "&amp;"，
 
+----------
+
 数据处理
 在PHP中使用的分离器用于分离参数以分离URL地址。PHP的默认设置为&符号。参考：http://php.net/arg-separator.output，例如：arg_separator.output = "&amp;"这里的&amp;为html实体
+
+----------
 
  589 
  590 ; List of separator(s) used by PHP to parse input URLs into variables.
@@ -870,7 +1135,11 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  594 ; Example:
  595 ;arg_separator.input = ";&"
 
+----------
+
 这个配置是被PHP使用的解析输入的url地址参数的分离器列表。PHP的默认设置为&。注意：这条指令的每个字符都被当做分离器。参考：http://php.net/arg-separator.input，示例：arg_separator.input = ";&"
+
+----------
 
  596 
  597 ; This directive determines which super global arrays are registered when PHP
@@ -886,7 +1155,11 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  607 ; http://php.net/variables-order
  608 variables_order = "GPCS"
 
-这条指令决定当PHP启动时哪些全局数组被注册。G,P,C,E & S是下面相关全局数组的缩写：GET, POST, COOKIE, ENV and SERVER。为了注册这些数组会PHP会存在一些性能上的损失，在生产环境下不推荐开启ENV。但是你仍然可以通过使用函数getenv()来连接使用环境变量。默认的值为"EGPCS"，开发环境下默认值为"GPCS"，生产环境下值为"GPCS"，参考：http://php.net/variables-order，这里的配置为variables_order = "GPCS"
+----------
+
+这条指令决定当PHP启动时哪些全局数组被注册。G,P,C,E & S是下面相关全局数组的缩写：GET, POST, COOKIE, ENV and SERVER。为了注册这些数组，PHP会存在一些性能上的损失，在生产环境下不推荐开启ENV。但是你仍然可以通过使用函数getenv()来连接使用环境变量。默认的值为"EGPCS"，开发环境下默认值为"GPCS"，生产环境下值为"GPCS"，参考：http://php.net/variables-order，这里的配置为variables_order = "GPCS"
+
+----------
 
  609 
  610 ; This directive determines which super global data (G,P & C) should be
@@ -902,7 +1175,11 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  620 ; http://php.net/request-order
  621 request_order = "GP"
 
-这条指令决定哪些全局变量数据(G,P & C)应该被注册到全局数组REQUEST中。如果设置了的话，它也决定了数据被注册的顺序（即同名变量会保存后面的）。这条指令的值的含义与variables_order指令相同。将这条指令设置为空会导致PHP使用variables_order指令设置的值。它并不意味着将全局数组REQUEST设置为空。默认的值为none,开发环境下的值为GP，生产环境下的值为GP，参考：http://php.net/request-order，这里的配置为request_order = "GP"。
+----------
+
+这条指令决定哪些全局变量数据(G,P & C)应该被注册到全局数组REQUEST中。如果设置了的话，它也决定了数据被注册的顺序（即同名变量会保存后面的），从左到右新值会覆盖旧值。这条指令的值的含义与variables_order指令相同。将这条指令设置为空会导致PHP使用variables_order指令设置的值。它并不意味着将全局数组REQUEST设置为空。默认的值为none,开发环境下的值为GP，生产环境下的值为GP，参考：http://php.net/request-order，这里的配置为request_order = "GP"。
+
+----------
 
  622 
  623 ; This directive determines whether PHP registers $argv & $argc each time it
@@ -920,7 +1197,11 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  635 ; http://php.net/register-argc-argv
  636 register_argc_argv = Off
 
+----------
+
 这条指令决定当PHP每次运行时是否注册$argv 和 $argc。$argv包括一个当脚本被调用时所有传递到PHP的参数的一个数组。$argc为一个当脚本被调用时传递到PHP的参数的个数的整数。当在命令行运行脚本时这些数组非常的有用。当这条指令被开启时，每一次脚本被执行时注册这些变量都要消耗CPU和内存。处于性能的原因，应该在生产环境下禁用这些特性。注意：在CLI SAPI情况下，这条指令被硬编码为On。默认值为On,开发环境下值为Off,生产环境下值为Off,参考：http://php.net/register-argc-argv。这里的配置值为register_argc_argv = Off
+
+----------
 
  637 
  638 ; When enabled, the ENV, REQUEST and SERVER variables are created when they're
@@ -931,7 +1212,11 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  643 ; http://php.net/auto-globals-jit
  644 auto_globals_jit = On
 
+----------
+
 当这条指令被开启时，ENV, REQUEST and SERVER在第一次被使用时就被创建了而不是在脚本开始时。如果在一个脚本中这些变量没有被使用，开启这条指令将会导致性能增益。为了使得这条指令起作用必须禁用PHP的register_argc_argv指令。参考：http://php.net/auto-globals-jit。这里的配置为：auto_globals_jit = On。
+
+----------
 
  645 
  646 ; Whether PHP will read the POST data.
@@ -943,7 +1228,11 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  652 ; http://php.net/enable-post-data-reading
  653 ;enable_post_data_reading = Off
 
+----------
+
 无论PHP是否读取POST数据，这个选项默认都是开启的。更可能的是，你不想整体的禁用这个选项。这会导致￥——POST和$_FILES总是为空。你可能读取$_POST数据的唯一途径是通过php://input流包装。在代理请求或者在内存中运行$_POST数据时非常有用。
+
+----------
 
  654 
  655 ; Maximum size of POST data that PHP will accept.
@@ -952,21 +1241,33 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  658 ; http://php.net/post-max-size
  659 post_max_size = 8M
 
+----------
+
 这条指令规定PHP通过POST方式可接受的数据的最大大小。如果设置为0表示没有限制。如果通过enable_post_data_reading指令禁用了读取POST数据则会忽略这条指令。参考：http://php.net/post-max-siz，这里的配置为post_max_size = 8M。
+
+----------
 
  660 
  661 ; Automatically add files before PHP document.
  662 ; http://php.net/auto-prepend-file
  663 auto_prepend_file =
 
+----------
+
 这条指令会在PHP文档之前自动添加文件，参考：http://php.net/auto-prepend-file。这里的配置为：auto_prepend_file =
+说明：该函数就像调用了include函数一样被包含了进来
+----------
 
  664 
  665 ; Automatically add files after PHP document.
  666 ; http://php.net/auto-append-file
  667 auto_append_file =
 
+----------
+
 这条指令会在PHP文档之后自动添加文件，参考：http://php.net/auto-prepend-file。这里的配置为：auto_prepend_file =
+说明：该函数就像调用了include函数一样被包含了进来
+----------
 
  668 
  669 ; By default, PHP will output a media type using the Content-Type header. To
@@ -976,15 +1277,27 @@ windows显示crt_warning警告，默认值为0，开发环境下为0，生产环
  673 ; http://php.net/default-mimetype
  674 default_mimetype = "text/html"
 
+----------
+
 默认的，PHP能够通过制定头部Content-Type header来输出一个媒体类型的数据。为了禁用此项设置，只需简单的将此指令设置为空。
 PHP内置的默认媒体类型被设置为text/html。参考：http://php.net/default-mimetype。这里的配置为：default_mimetype = "text/html"
+说明： PHP总是默认地在"Content-type:"头中设置输出文档的MIME类型和字符集的编码方式。
+要让输出字符集失效，只要设置为空或注释掉即可。
+PHP的默认设置会输出"Content-Type: text/html"
+若去掉"default_charset"前的注释并将其设为"gb2312"，
+那么将会输出"Content-Type: text/html; charset=gb2312"
+----------
 
  675 
  676 ; PHP's default character set is set to UTF-8.
  677 ; http://php.net/default-charset
  678 default_charset = "UTF-8"
 
+----------
+
 PHP默认的字符集被设置为UTF-8，参考： http://php.net/default-charset。这里的配置为default_charset = "UTF-8"。
+
+----------
 
  679 
  680 ; PHP internal character encoding is set to empty.
@@ -992,7 +1305,11 @@ PHP默认的字符集被设置为UTF-8，参考： http://php.net/default-charse
  682 ; http://php.net/internal-encoding
  683 ;internal_encoding =
 
+----------
+
 PHP内部的字符集encoding被设置为空，如果设置为空则默认的default_charset被使用，即使用上调指令的设置值。参考：http://php.net/internal-encoding。这里的配置为：internal_encoding =
+
+----------
 
  684 
  685 ; PHP input character encoding is set to empty.
@@ -1000,7 +1317,11 @@ PHP内部的字符集encoding被设置为空，如果设置为空则默认的def
  687 ; http://php.net/input-encoding
  688 ;input_encoding =
 
+----------
+
 PHP读输入数据的编码被设置为空，如果被设置为空则使用default_charset指定的字符集。参考：http://php.net/input-encoding。这里的配置为input_encoding =。
+
+----------
 
  689 
  690 ; PHP output character encoding is set to empty.
@@ -1010,7 +1331,11 @@ PHP读输入数据的编码被设置为空，如果被设置为空则使用defau
  694 ; http://php.net/output-encoding
  695 ;output_encoding =
 
+----------
+
 PHP输出数据的编码被设置为空，如果被设置为空则使用default_charset的设置值。mbstring 或者 iconv输出处理会被使用。查看输出缓冲。参考：http://php.net/output-encoding。这里的配置为output_encoding =。
+
+----------
 
  696 
  697 ;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1023,14 +1348,22 @@ PHP输出数据的编码被设置为空，如果被设置为空则使用default_
  704 ; Windows: "\path1;\path2"
  705 ;include_path = ".;c:\php\includes"
 
+----------
+
 UNIX的格式为："/path1:/path2"，示例：include_path = ".:/php/includes"
 Windows的格式为：Windows: "\path1;\path2"，示例：include_path = ".;c:\php\includes"
+
+----------
 
  706 ;
  707 ; PHP's default setting for include_path is ".;/path/to/php/pear"
  708 ; http://php.net/include-path
 
+----------
+
 PHP的为include_path默认设置为".;/path/to/php/pear"，参考：http://php.net/include-path
+
+----------
 
  709 
  710 ; The root of the PHP pages, used only if nonempty.
@@ -1041,8 +1374,12 @@ PHP的为include_path默认设置为".;/path/to/php/pear"，参考：http://php.
  715 ; http://php.net/doc-root
  716 doc_root =
 
+----------
+
 PHP文件的根目录，只有非空时才被使用。如果PHP没有被FORCE_REDIRECT编译，你应该设置此选项
 如果你在除了IIS以外得服务器下将PHP作为CGI来运行时则查看文档中以了解更多的安全问题。这时可以选择使用下面的cgi.force_redirect配置。参考：http://php.net/doc-root。这里的配置为doc_root =
+
+----------
 
  717 
  718 ; The directory under which PHP opens the script using /~username used only
@@ -1050,7 +1387,11 @@ PHP文件的根目录，只有非空时才被使用。如果PHP没有被FORCE_RE
  720 ; http://php.net/user-dir
  721 user_dir =
 
-只有在下一条指令不为空的情况下，当PHP使用/~username代开脚本时下面的指令才被使用，参考：http://php.net/user-dir。这里的配置为：user_dir =
+----------
+
+只有在下一条指令不为空的情况下，当PHP使用/~username打开脚本时下面的指令才被使用，参考：http://php.net/user-dir。这里的配置为：user_dir =
+
+----------
 
  722 
  723 ; Directory in which the loadable extensions (modules) reside.
@@ -1059,14 +1400,22 @@ PHP文件的根目录，只有非空时才被使用。如果PHP没有被FORCE_RE
  726 ; On windows:
  727 ; extension_dir = "ext"
 
+----------
+
 这个选项指定可以加载的扩展模块存储的目录。参考：http://php.net/extension-dir。扩展目录设置：extension_dir = "./"，在windows下配置为extension_dir = "ext"。
+
+----------
 
  728 
  729 ; Directory where the temporary files should be placed.
  730 ; Defaults to the system default (see sys_get_temp_dir)
  731 ; sys_temp_dir = "/tmp"
 
+----------
+
 这条指令指定临时文件存储的目录，默认的存储路径为系统默认的路径（查看选项sys_get_temp_dir),这里的配置为：sys_temp_dir = "/tmp"
+
+----------
 
  732 
  733 ; Whether or not to enable the dl() function.  The dl() function does NOT work
@@ -1075,7 +1424,11 @@ PHP文件的根目录，只有非空时才被使用。如果PHP没有被FORCE_RE
  736 ; http://php.net/enable-dl
  737 enable_dl = Off
 
+----------
+
 这个选项指定是否启用dl()函数。在多线程服务器上dl()函数工作的不是很好，如IIS或者Zeus，而且在这些服务器上自动禁用了这个函数。参考：http://php.net/enable-dl。这里的配置为enable_dl = Off。
+
+----------
 
  738 
  739 ; cgi.force_redirect is necessary to provide security running PHP as a CGI under
@@ -1085,15 +1438,23 @@ PHP文件的根目录，只有非空时才被使用。如果PHP没有被FORCE_RE
  743 ; http://php.net/cgi.force-redirect
  744 ;cgi.force_redirect = 1
 
+----------
+
 在大多数服务器中，将PHP作为CGI来运行时cgi.force_redirect选项能够提供必要的安全性。如果这个选项不被定义则PHP默认开启此项配置。你可以在这里将它关闭。你可以在IIS下安全的关闭此项设置，事实上你必须这样做。
 参考：http://php.net/cgi.force-redirect。这里的配置为：cgi.force_redirect = 1
+
+----------
 
  745 
  746 ; if cgi.nph is enabled it will force cgi to always sent Status: 200 with
  747 ; every request. PHP's default behavior is to disable this feature.
  748 ;cgi.nph = 1
 
+----------
+
 如果cgi.nph被开启的话，他将会总是对每一个请求发送200状态码。PHP默认禁用了这一特性。这里的配置为：cgi.nph = 1
+
+----------
 
  749 
  750 ; if cgi.force_redirect is turned on, and you are not running under Apache or Netscape
@@ -1103,7 +1464,11 @@ PHP文件的根目录，只有非空时才被使用。如果PHP没有被FORCE_RE
  754 ; http://php.net/cgi.redirect-status-env
  755 ;cgi.redirect_status_env =
 
+----------
+
 如果选项cgi.force_redirect被开启了而且你没有再apache或者netscape网路服务器下运行PHP，你也许需要设置一个环境变量名供PHP查询以是PHP知道继续运行时ok的。设置这个变量也许会导致安全问题，你要知道自己正在做什么。参考：http://php.net/cgi.redirect-status-env，这里的配置为：cgi.redirect_status_env =
+
+----------
 
  756 
  757 ; cgi.fix_pathinfo provides *real* PATH_INFO/PATH_TRANSLATED support for CGI.  PHP's
@@ -1115,7 +1480,11 @@ PHP文件的根目录，只有非空时才被使用。如果PHP没有被FORCE_RE
  763 ; http://php.net/cgi.fix-pathinfo
  764 ;cgi.fix_pathinfo=1
 
+----------
+
 cgi.fix_pathinfo选项为CGI提供了绝对路径转换。PHP的之前的行为是将PATH_TRANSLATED设置到SCRIPT_FILENAME。并且不获得PATH_INFO是什么。查看cgi specs以获得更多信息。将这个值设置为1将会导致PHP项以前一样工作。默认值为1。你需要修改你的脚本使用SCRIPT_FILENAME而不是PATH_TRANSLATED。参考：http://php.net/cgi.fix-pathinfo，这里的配置为：cgi.fix_pathinfo=1
+
+----------
 
  765 
  766 ; FastCGI under IIS (on WINNT based OS) supports the ability to impersonate
@@ -1126,14 +1495,22 @@ cgi.fix_pathinfo选项为CGI提供了绝对路径转换。PHP的之前的行为�
  771 ; http://php.net/fastcgi.impersonate
  772 ;fastcgi.impersonate = 1
 
+----------
+
 在基于winnt系统的IIS服务器下的FastCGI支持冒充客户端的安全令牌功能。这个选项允许IIS定义在他之下运行的请求的安全上下文。在apache下的mod_fastcgi目前不支持这个特性。如果在IIS下运行将此选项设置为1，默认值为0.参考：http://php.net/fastcgi.impersonate。这里的配置为：fastcgi.impersonate = 1
+
+----------
 
  773 
  774 ; Disable logging through FastCGI connection. PHP's default behavior is to enable
  775 ; this feature.
  776 ;fastcgi.logging = 0
 
+----------
+
 这条指令使得通过FashCGI连接时禁用日志。PHP的默认行为会启用这个特性。这里的配置为fastcgi.logging = 0
+
+----------
 
  777 
  778 ; cgi.rfc2616_headers configuration option tells PHP what type of headers to
@@ -1144,7 +1521,11 @@ cgi.fix_pathinfo选项为CGI提供了绝对路径转换。PHP的之前的行为�
  783 ; http://php.net/cgi.rfc2616-headers
  784 ;cgi.rfc2616_headers = 0
 
+----------
+
 cgi.rfc2616_headers配置选项告诉PHP当发送HTTP相应代码时使用哪些headers类型。如果爱能够此项设置为0，PHP发送得状态码为：apache支持的头类型。当这个选项设置为1，PHP将会发送RFC2616兼容的头。默认值为0，参考：http://php.net/cgi.rfc2616-headers。这里的配置为：cgi.rfc2616_headers = 0。
+
+----------
 
  785 
  786 ;;;;;;;;;;;;;;;;
@@ -1167,14 +1548,18 @@ cgi.rfc2616_headers配置选项告诉PHP当发送HTTP相应代码时使用哪些
  803 ; Maximum number of files that can be uploaded via a single request
  804 max_file_uploads = 20
 
+----------
+
 文件上传配置
 是否允许http文件上传功能，参考：http://php.net/file-uploads，这里的配置为：file_uploads = On
 
-http上传文件存储的路径（如果没有指定则默认使用系统的），参考：http://php.net/upload-tmp-dir。这里的配置为upload_tmp_dir =。
+http上传文件存储的路径（如果没有指定则默认使用系统的），参考：http://php.net/upload-tmp-dir。这里的配置为upload_tmp_dir =。该目录必须要是PHP用户可读可写的目录
 
 最大允许上传文件的大小，参考：http://php.net/upload-max-filesize。这里的配置为：upload_max_filesize = 2M。
 
 在一个单一请求中最大允许上传的文件数目，这里的配置为：upload_max_filesize = 2M
+
+----------
 
  805 
  806 ;;;;;;;;;;;;;;;;;;
@@ -1210,10 +1595,18 @@ http上传文件存储的路径（如果没有指定则默认使用系统的）�
  836 ; http://php.net/auto-detect-line-endings
  837 ;auto_detect_line_endings = Off
 
+----------
+
 文件打开封装
 是否允许将url地址（像http:// 或者ftp://样式的)当做文件来看待。参考：http://php.net/allow-url-fopen。这里的配置为：allow_url_fopen = On（应该是使得fopen可以打开网址）
 
 定义匿名的ftp账户密码（你的电子邮件地址）。PHP默认将此项设置为空。参考：http://php.net/from。这里的配置为：from="john@doe.com"
+
+定义User-Agent字符串。PHP为此选项的默认值空的。参考：http://php.net/user-agent。这类的配置为user_agent="PHP"。
+为基于流的socket设置的过期时间。参考:http://php.net/default-socket-timeout。这里的配置为default_socket_timeout = 60，单位为秒。
+如果你的脚本不得不处理来自Mac系统文件或者你不得不在正在运行的Mac电脑上处理来自Unix或者win32系统的文件时，设置这个选项将会使得PHP自动检测文件末尾字符以便于fgets() and file()这两个函数能够工作而不管文件的来源。参考：http://php.net/auto-detect-line-endings。这里的配置为auto_detect_line_endings = Off。
+
+----------
 
  838 
  839 ;;;;;;;;;;;;;;;;;;;;;;
@@ -1246,6 +1639,8 @@ http上传文件存储的路径（如果没有指定则默认使用系统的）�
  866 ; extension folders as well as the separate PECL DLL download (PHP 5+).
  867 ; Be sure to appropriately set the extension_dir directive.
 
+----------
+
 如果你希望扩展自动加载，使用下面的语法：extension=modulename.extension
 示例：
 在windows中：extension=msql.dll
@@ -1256,6 +1651,8 @@ http上传文件存储的路径（如果没有指定则默认使用系统的）�
 windows扩展：
 注意：PHP内置了ODBC支持。因此dll不是必须的。
 注意：许多动态扩展文件被放在了PHP4的extension文件夹或者PHP5+的ext文件夹下，也包括单独下载的PECL动态库。因此确定恰当的设置了扩展文件目录。
+
+----------
 
  868 ;
  869 ;extension=php_bz2.dll

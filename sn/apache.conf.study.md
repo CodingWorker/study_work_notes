@@ -250,6 +250,8 @@ LoadModule version_module modules/mod_version.so
 User daemon
 Group daemon
 
+----------
+
 如果模块unixd_module存在，那么
 
 如果你希望httpd作为一个不同的用户或者组来运行，你必须在最初作为root运行httpd,这样他就会改变。
@@ -260,6 +262,7 @@ Group daemon
 用户进程
 用户组进程
 
+----------
 
 </IfModule>
 
