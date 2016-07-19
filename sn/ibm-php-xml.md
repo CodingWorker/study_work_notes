@@ -217,7 +217,17 @@ xml非常啰嗦，存储体积大，消耗带宽多
 
 ###使用DOM
 
-使用DOM可以构建、修改、查询、验证和转换xml文档。可以利用所有得DOM方法和属性
+- 使用DOM可以构建、修改、查询、验证和转换xml文档。可以利用所有得DOM方法和属性
+- 使用DOM可以解析任意复杂的文档
+
+	$doc = new DOMdocument();
+	// $doc->validateOnParse = true;
+	$doc->Load('D:\xampp\htdocs\www\test\xml.txt');
+	echo "the element whose id is myelement is:";
+	print_r($doc->getElementsByTagName('name'));
 
 
+###总结
 
+DOM利用DOM的方法来解析xml和html等DOM类型文档。
+simplexml只能解析xml文档，适合不复杂且文档较小的解析需求。
