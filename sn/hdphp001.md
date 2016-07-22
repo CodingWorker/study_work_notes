@@ -37,11 +37,11 @@
 	如果 var  是 integer  则返回 TRUE ，否则返回 FALSE 。 
 	若想测试一个变量是否是数字或数字字符串（如表单输入，它们通常为字符串），必须使用 is_numeric() 。
 
-###glob扫描目录，以指定模式来查找文件
+###glob扫描目录（参数中指定），以指定模式来查找文件
 
-###scandir 扫描文件夹下的所有文件，包括 .  和  ..
+###scandir 扫描文件夹下的所有文件返回文件名，包括 .  和  ..
 
-###filetype - 返回文件或目录的类型名称，对比is_file
+###filetype - 返回文件或目录的类型名称，对比is_file  --  is_dir
 	string filetype  ( string $filename  )
 	返回文件的类型。 
 	返回文件的类型。 可能的值有 fifo，char，dir，block，link，file 和 unknown。 
@@ -49,7 +49,7 @@
 
 ###filesize
  
-
+###file_exists检测文件或目录是否存在
 
 
 ##setcookie设置cookie时将值尽量序列化
@@ -61,6 +61,7 @@
 
 extension_loaded('gd');
 
+####制作缩略图
 **imagecopyresampled — 重采样拷贝部分图像并调整大小 **
 
 	bool imagecopyresampled  ( resource $dst_image  , resource $src_image  , int $dst_x  , int $dst_y  , int $src_x  , int $src_y  , int $dst_w  , int $dst_h  , int $src_w  , int $src_h  )
