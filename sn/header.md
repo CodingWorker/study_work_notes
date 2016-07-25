@@ -12,11 +12,11 @@ header函数的作用是给客户端发送头信息
 	
 - 跳转
 	
-	header('Location:http://www.baidu.com);//这个跳转只有浏览器知道，用户看不到
+	header('Location:http://www.baidu.com‘);//这个跳转只有浏览器知道，用户看不到，跳转是立即的
 
 - 指定网页内容
 
-	 同样一个XML文件，如果头信息中指定：Content-type: application/xml 的话，浏览器会将其按照XML文件格式解析。但是，如果头信息中是：Content-type: text/xml 的话，浏览器就会将其看作存文本解析。（浏览器不是按照扩展名解析文件的）
+	 同样一个XML文件，如果头信息中指定：Content-type: application/xml 的话，浏览器会将其按照XML文件格式解析。但是，如果头信息中是：Content-type: text/xml 的话，浏览器就会将其看作存文本解析。（浏览器不是按照扩展名解析文件的，而是根据头信息来解析文件的）
 
 - 附件
 
