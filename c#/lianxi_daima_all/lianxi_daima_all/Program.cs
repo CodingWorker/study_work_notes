@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading;
+using System.IO;
 
 namespace Program
 {
@@ -238,39 +239,39 @@ namespace Program
          }
      }
      */
-     /*
-    class Test
-    {
-        static void Main()
-        {
-            int[] arr = new int[] { 1,2,64,3,4,23,54,6,2,2,145,4,234,23,21,43,2,3,4,556,67,4,33};
-            int len = arr.Length;
-            for(int i = 0; i < len; i++)
-            {
-              
-                for(int j=i;j>=0; j--)
-                {
-                    if (j==0)
-                    {
-                        continue;
-                    }
-                    if (arr[j-1] > arr[j])
-                    {
-                        int tmp = arr[j-1];
-                        arr[j - 1] = arr[j];
-                        arr[j] = tmp;
-                    }
-                }
-            }
-            for(int i=0;i< len; i++)
-            {
-                Console.WriteLine(arr[i]);
-            }
-            Console.ReadKey();
+    /*
+   class Test
+   {
+       static void Main()
+       {
+           int[] arr = new int[] { 1,2,64,3,4,23,54,6,2,2,145,4,234,23,21,43,2,3,4,556,67,4,33};
+           int len = arr.Length;
+           for(int i = 0; i < len; i++)
+           {
 
-        }
-    }
-    */
+               for(int j=i;j>=0; j--)
+               {
+                   if (j==0)
+                   {
+                       continue;
+                   }
+                   if (arr[j-1] > arr[j])
+                   {
+                       int tmp = arr[j-1];
+                       arr[j - 1] = arr[j];
+                       arr[j] = tmp;
+                   }
+               }
+           }
+           for(int i=0;i< len; i++)
+           {
+               Console.WriteLine(arr[i]);
+           }
+           Console.ReadKey();
+
+       }
+   }
+   */
     /*
     class Test
     {
@@ -324,20 +325,138 @@ namespace Program
         }
     }
     */
+    /*
+     class Test
+     {
+         public const int A = 1;
+         public const int B= A + 1;
+         static void Main()
+         {
+             Console.WriteLine("A={0},B={1}", Test.A, Test.B);
+             Console.ReadKey();
+         }
+     }
+     */
+    /*
     class Test
     {
-        public const int A = 1;
-        public const int B= A + 1;
-        static void Main()
+        public static void Main()
         {
-            Console.WriteLine("A={0},B={1}", Test.A, Test.B);
+            string str = "12344";
+            int channelId = 0;
+            Console.WriteLine(int.TryParse(str, out channelId));//转换成功返回True
+            Console.WriteLine(channelId);//这时将转换成功的数字格式赋值给了channelId
             Console.ReadKey();
         }
     }
-   
+    */
+    /*
+    class Test
+    {
+        public static void Main()
+        {
+            string path = Directory.GetCurrentDirectory();
+            Console.WriteLine(path);//E:\notes\c#\lianxi_daima_all\lianxi_daima_all\bin\Debug
+            Console.ReadKey();
+        }
+    }
+    */
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using System.Text.RegularExpressions;
+    //using TeamDev.Redis;
+
+
+    public class TvNavigationPublisher
+        {
+            /*
+            电影       "1"
+            电视剧     "2"
+            动漫      "3"
+            综艺      "4"
+            纪录片     "5"
+            欧美剧     "6"
+            ...
 
 
 
+
+
+            */
+            //内容发布，写入redis
+            public  void Pulish()
+            {
+                var tvNavigation = ReadJsonFiles();
+                WriteToRedis(tvNavigation);
+            }
+
+            private Dictionary<string, string> ReadJsonFiles()
+            {
+                //string TvNavigationRootPath = System.Configuration.ConfigurationManager.AppSettings["TvNavigation"];
+                string TvNavigationRootPath = "C:\\Users\\daiyan\\Documents\\Tencent Files\\3514526521\\FileRecv\\json";
+                //读取json文件
+                var filePaths = Directory.GetFiles(TvNavigationRootPath, "*.json");
+
+                //定义一个字典
+                var dic = new Dictionary<string, string>();
+                foreach (var filePath in filePaths)
+                {
+                    if (!File.Exists(filePath))
+                    {
+                        continue;
+                    }
+                    var jsonContent = File.ReadAllText(filePath, Encoding.UTF8);
+                    
+                    if (jsonContent == null || string.IsNullOrEmpty(jsonContent))
+                    {
+                        continue;
+                    }
+
+                //组合字典的键，将内容存储到字典
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
+                var key = fileName.Substring(fileName.IndexOf("-")+1);
+               
+                if (!dic.ContainsKey(key))
+                    {
+                        dic.Add(key, jsonContent);
+                    }
+
+                }
+            Console.WriteLine(dic);
+            return dic;
+            
+        }
+
+            //将文件内容写入redis
+            private void WriteToRedis(Dictionary<string, string> tvNavigationJsonDic)
+            {
+                if (tvNavigationJsonDic == null || tvNavigationJsonDic.Count == 0)
+                {
+                    return;
+                }
+               // using (RedisDataAccessProvider redisClient = MoliServer20.Common.Utils.RedisClient.GetRedisClient(PublishController.Redis.RedisServer))
+                {
+                    //将内容存入redis的指定key中
+                    //redisClient.Hash[PublishController.MakeKey("TvNavigation")].Set(tvNavigationJsonDic);
+                }
+
+            }
+
+        }
+
+    class Test
+    {
+        public static void Main()
+        {
+            var a = new TvNavigationPublisher();
+            a.Pulish();
+
+            Console.ReadKey();
+        }
+    }
 
 
 
