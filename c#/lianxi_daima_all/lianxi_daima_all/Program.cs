@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.IO;
 
-namespace Program
-{
+//namespace Program
+//{
     /*
     class Program
     {
@@ -364,100 +364,118 @@ namespace Program
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.IO.Compression;
     using System.Linq;
     using System.Text;
-    using System.Text.RegularExpressions;
     //using TeamDev.Redis;
 
 
-    public class TvNavigationPublisher
+    namespace MoliServer20.Publisher.Common
+    {
+        public class TvFilter
         {
-            /*
-            电影       "1"
-            电视剧     "2"
-            动漫      "3"
-            综艺      "4"
-            纪录片     "5"
-            欧美剧     "6"
-            ...
-
-
-
-
-
-            */
-            //内容发布，写入redis
-            public  void Pulish()
+            public void Publish()
             {
-                var tvNavigation = ReadJsonFiles();
-                WriteToRedis(tvNavigation);
+                var tvFilter = ReadJsonFiles();
+                //WriteToRedis(tvFilter);
             }
 
+            //读取json文件方法
             private Dictionary<string, string> ReadJsonFiles()
             {
-                //string TvNavigationRootPath = System.Configuration.ConfigurationManager.AppSettings["TvNavigation"];
-                string TvNavigationRootPath = "C:\\Users\\daiyan\\Documents\\Tencent Files\\3514526521\\FileRecv\\json";
-                //读取json文件
-                var filePaths = Directory.GetFiles(TvNavigationRootPath, "*.json");
+                //string tvFilterRootPath = System.Configuration.ConfigurationManager.AppSettings["TvFilterDir"];
+                string tvFilterRootPath = @"C:\Users\daiyan\Documents\Tencent Files\3514526521\FileRecv\filter";
+                //读取压缩json文件
+                var compressFilePaths = Directory.GetFiles(tvFilterRootPath, "*.json.compression");
 
                 //定义一个字典
                 var dic = new Dictionary<string, string>();
-                foreach (var filePath in filePaths)
+               // Compress compressObj = new Compress();
+                foreach (var compressFilePath in compressFilePaths)
                 {
-                    if (!File.Exists(filePath))
+                    if (!File.Exists(compressFilePath))
                     {
                         continue;
                     }
-                    var jsonContent = File.ReadAllText(filePath, Encoding.UTF8);
-                    
-                    if (jsonContent == null || string.IsNullOrEmpty(jsonContent))
-                    {
-                        continue;
-                    }
+                    //将文件读入流数据。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。。
+                    FileStream compressFileStream = new FileStream(compressFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    var jsonByte = DeCompress(compressFileStream);
+                    var jsonContent = Encoding.UTF8.GetString(jsonByte);
 
-                //组合字典的键，将内容存储到字典
-                var fileName = Path.GetFileNameWithoutExtension(filePath);
-                var key = fileName.Substring(fileName.IndexOf("-")+1);
-               
-                if (!dic.ContainsKey(key))
+                if (jsonContent == null || string.IsNullOrEmpty(jsonContent))
                     {
+                        continue;
+                    }
+                
+                    //组合字典的键，将内容存储到字典
+                    int indexStart = compressFilePath.IndexOf("=") + 1;
+                    int indexEnd = compressFilePath.IndexOf(".", indexStart);
+                    var key = compressFilePath.Substring(indexStart, indexEnd - indexStart);
+                    if (!dic.ContainsKey(key))
+                    {
+                        Console.WriteLine(key);
+                        Console.ReadKey();
+                        Console.WriteLine(jsonContent);
+                        Console.ReadKey();
                         dic.Add(key, jsonContent);
                     }
 
                 }
-            Console.WriteLine(dic);
-            return dic;
-            
-        }
+                return dic;
+            }
 
-            //将文件内容写入redis
-            private void WriteToRedis(Dictionary<string, string> tvNavigationJsonDic)
+            ////将文件内容写入redis
+            //private void WriteToRedis(Dictionary<string, string> tvFilterJsonDic)
+            //{
+            //    if (tvFilterJsonDic == null || tvFilterJsonDic.Count == 0)
+            //    {
+            //        return;
+            //    }
+
+            //    using (RedisDataAccessProvider redisClient = MoliServer20.Common.Utils.RedisClient.GetRedisClient(PublishController.Redis.RedisServer))
+            //    {
+            //        //将内容存入redis的指定key中
+            //        redisClient.Hash[PublishController.MakeKey("TvFilter")].Set(tvFilterJsonDic);
+            //    }
+            //}
+
+            //解压方法
+            public static byte[] DeCompress(Stream aSourceStream)
             {
-                if (tvNavigationJsonDic == null || tvNavigationJsonDic.Count == 0)
-                {
-                    return;
-                }
-               // using (RedisDataAccessProvider redisClient = MoliServer20.Common.Utils.RedisClient.GetRedisClient(PublishController.Redis.RedisServer))
-                {
-                    //将内容存入redis的指定key中
-                    //redisClient.Hash[PublishController.MakeKey("TvNavigation")].Set(tvNavigationJsonDic);
-                }
+                byte[] vUnZipByte = null;
+                GZipStream vUnZipStream;
 
+                using (MemoryStream vMemory = new MemoryStream())
+                {
+                    vUnZipStream = new GZipStream(aSourceStream, CompressionMode.Decompress);
+                    try
+                    {
+                        byte[] vTempByte = new byte[1024];
+                        int vRedLen = 0;
+                        do
+                        {
+                            vRedLen = vUnZipStream.Read(vTempByte, 0, vTempByte.Length);
+                            vMemory.Write(vTempByte, 0, vRedLen);
+                        }
+                        while (vRedLen > 0);
+                        vUnZipStream.Close();
+                    }
+                    finally
+                    {
+                        vUnZipStream.Dispose();
+                    }
+                    vUnZipByte = vMemory.ToArray();
+                }
+                return vUnZipByte;
             }
 
         }
-
-    class Test
-    {
-        public static void Main()
+        class Test
         {
-            var a = new TvNavigationPublisher();
-            a.Pulish();
-
-            Console.ReadKey();
+            public static void Main()
+            {
+                TvFilter obj = new TvFilter();
+                obj.Publish();
+            }
         }
     }
-
-
-
-}
