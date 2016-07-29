@@ -258,7 +258,7 @@
 	rdbcompression yes
 
 >该指令控制在存储rdb数据时是否使用LZF压缩来压缩字符串
->默认的这一个配置项设置为yes,因为他总是
+>默认的这一个配置项设置为yes,因为这样总是没有错误的。如果你想在复制数据时节省一些CPU使用率，将它设置为no。但是如果你可以压缩的key或者value而不压缩，那么数据就可能很大。
 
 	
 	# Since version 5 of RDB a CRC64 checksum is placed at the end of the file.
@@ -269,9 +269,16 @@
 	# RDB files created with checksum disabled have a checksum of zero that will
 	# tell the loading code to skip the check.
 	rdbchecksum yes
+
+>由于第5版的RDB的一个CRC64校验值被放在了文件的末尾。这使样式更加的抗崩溃。但是在保存和加载RDB文件时，这是以降低一些性能的（大约10%）为代价的。因此为了追求最高的性能表现你可以禁用它。
+>禁用了校验值的RDB文件在创建时创建了一个值为0的校验值。这个值将会告诉加载的程序跳过此校验。
+>这里的配置为 rdbchecksum yes
 	
 	# The filename where to dump the DB
 	dbfilename dump.rdb
+
+>这条指令指示数据吧保存的文件名（下面的配置指令指明文件的路径）
+>这里的配置为 dbfilename dump.rdb
 	
 	# The working directory.
 	#
@@ -282,6 +289,11 @@
 	# 
 	# Note that you must specify a directory here, not a file name.
 	dir ./
+
+>工作目录
+>数据将会被写入工作目录，以在上面的配置指令里指明的文件名。附加的文件也可以在这个文件目录里创建
+>注意：在这里你必须指明一个文件目录而不是文件名。
+>这里的配置为  dir ./
 	
 	################################# REPLICATION #################################
 	
@@ -300,6 +312,13 @@
 	#    and resynchronize with them.
 	#
 	# slaveof <masterip> <masterport>
+
+>主从配置
+>主从复制。使用slaveof指令指明一个redis服务器立即复制另一个redis的数据。关于redis的主从复制需要尽可能快的了解的知识。
+>redis的主从复制是异步的，如果当他每有与任何一台配置的从服务器连接的话，但是你可一个配置你的主服务器停止接受写入的功能。
+>如果同步连接断了一个相对很小的时间，redis从服务器能够实现部分同步主服务器的数据。你也学要根据你的需要想配置这个复制日志（更多详细信息下面会讲到）的一个合理的大小。
+>复制是自动的而且不需要创建。在从服务器自动的试图连接主服务器并且联通之后，就会开始同步数据。
+>配置语法为   slaveof <masterip> <masterport>
 	
 	# If the master is password protected (using the "requirepass" configuration
 	# directive below) it is possible to tell the slave to authenticate before
@@ -307,6 +326,9 @@
 	# refuse the slave request.
 	#
 	# masterauth <master-password>
+
+>如果主服务器是密码保护的（使用下面的requirepass配置指令来设置），他可能在开始复制的同步过程之前需要从服务器的验证。否则主服务器会拒绝从服务器的请求。
+>配置的语法为   masterauth <master-password>
 	
 	# When a slave loses its connection with the master, or when the replication
 	# is still in progress, the slave can act in two different ways:
@@ -320,6 +342,12 @@
 	#    but to INFO and SLAVEOF.
 	#
 	slave-serve-stale-data yes
+
+
+>当从服务器与主服务器失去了连接或者当同步工作正在进行，从服务器可以进行两种不同的操作：
+>1)如果slave-serve-stale-data指令被设置为yes（这也是默认值），那么从服务器将会仍然响应客户端请求的数据，可能这时使用的是过期的数据（也可能不是，因为有些数据并没有过期）。或者，如果这是第一次同步，那么被请求的数据在从服务器可能是个空值（在从服务器上还不存在接受请求就会返回空值）
+>2）如果指令slave-serve-stale-data被设置为no，那么从服务器会对任何除了info和slaveof命令外的请求响应一个SYNC with master in progress（正在于主服务器同步数据）的错误。
+>这里的配置为  slave-serve-stale-data yes。即在同步的同时从服务器也会继续接受数据请求，只是这时返回的可能是过期的数据。
 	
 	# You can configure a slave instance to accept writes or not. Writing against
 	# a slave instance may be useful to store some ephemeral data (because data
@@ -336,11 +364,16 @@
 	# security of read only slaves using 'rename-command' to shadow all the
 	# administrative / dangerous commands.
 	slave-read-only yes
-	
+
+你可以配置从服务器是否接受写入的命令（即从服务器是否只接受读命令，而不执行写的操作）。对一个从服务器禁止写的功能可能在存储一些非常短暂的数据时会非常得有用（因为这类数据很容易在重新连接主服务器上同步数据时被删除，因为数据过期时间很短，因此这次写入了数据，而在此同步数据时可能已经过期，从而又得删除数据）。但是由于某些错误的配置，如果客户端向其写入数据时可能会导致一些问题。
+自从Redis 2.6以来，这一配配置项默认为只读read-only。
+注意：设置为只读的redis服务器在网络上不会暴露给不可信的客户端。它只是防止乱用从服务器的一个保护层。尽管一个只读的从服务器默认输出所有的主服务器命令，例如 CONFIG, DEBUG等等。但是，为了限制，你也可以通过rename-command命令来屏蔽掉所有主服务器的危险的命令以提高只读从服务器的安全性。
+这里的配置为   slave-read-only yes
+
 	# Replication SYNC strategy: disk or socket.
 	#
 	# -------------------------------------------------------
-	# WARNING: DISKLESS REPLICATION IS EXPERIMENTAL CURRENTLY
+	# WARNING: DISKLESS REPLICATIONSLAGEOF IS EXPERIMENTAL CURRENTLY
 	# -------------------------------------------------------
 	#
 	# New slaves and reconnecting slaves that are not able to continue the replication
@@ -367,7 +400,17 @@
 	# With slow disks and fast (large bandwidth) networks, diskless replication
 	# works better.
 	repl-diskless-sync no
-	
+
+同步复制的策略：磁盘还是socket
+警告：目前，无磁盘复制还处于试验阶段。
+采用全同步：新的从服务器和再次连接的从服务器不会继续进行复制，它仅仅接受改变的的数据和需要去复制的。在同步数据时，一个RDB文件会被从主服务器传递到从服务器。这个传输能够以两种不同的方式进行：
+1）Disk-backed基于磁盘的：在这个模式下，主服务器redis会创建一个新的进程来在磁盘上写入RDB文件。之后，父进程会逐渐的将此文件传输到从服务器端。
+2）Diskless非磁盘形式：在这种模式下，主服务器redis会创建一个新的进程来直接将RDB文件写入到从服务器的sockets，而根本不会涉及磁盘。
+在基于磁盘的形式下，当RDB文件已经被生成后，大多数的从服务器可以进入队列，并且在子进程完成它生成RDB文件的工作后立即开始请求RDB文件。在无磁盘同步模式下则想法，一旦新的传输开始，新连接的redis从服务器会被编入队列，在当前的传输终止的时候会开始新的传输。
+当使用无磁盘形式的时候，在开始传输工作之前主服务器会等到一个配置的时间（单位为秒），以期望多数的服务器到达，并且传输能够并行化。
+在磁盘写入较慢而网络状况较好（高带宽）的情况下，无磁盘同步模式工作的更好。
+这里的配置为  repl-diskless-sync no
+
 	# When diskless replication is enabled, it is possible to configure the delay
 	# the server waits in order to spawn the child that trnasfers the RDB via socket
 	# to the slaves.
@@ -379,6 +422,11 @@
 	# The delay is specified in seconds, and by default is 5 seconds. To disable
 	# it entirely just set it to 0 seconds and the transfer will start ASAP.
 	repl-diskless-sync-delay 5
+
+当开启了无磁盘模式后，可能需要配置主服务器的延时时间以产生大量的子进程来通过连接从服务器的socket传输RDB文件。
+这是重要的，因为一旦传输开始主服务器就不会为新加入的服务器服务。从服务器会被编入下一次RDB文件传输的队列。因此为了让更多的从服务器到达主服务器会等到一段时间。
+这个被指定的延时时间是以秒为单位的，而且默认是5秒。为了完全禁用它，只需要将它设置为0，从而传输将会尽快开始
+这里的配置为 repl-diskless-sync-delay 5，即生成完RDB文件后延时5秒项从服务器传输数据
 	
 	# Slaves send PINGs to server in a predefined interval. It's possible to change
 	# this interval with the repl_ping_slave_period option. The default value is 10
@@ -397,7 +445,15 @@
 	# every time there is low traffic between the master and the slave.
 	#
 	# repl-timeout 60
-	
+
+在预定义的时间间隔，从服务器会向主服务器发送ping命令。可以通过配置repl_ping_slave_period选项来改变这个时间间隔。默认的时间间隔是10秒。
+示例配置为 repl-ping-slave-period 10
+下面的选项设置从服务器尝试连接主服务器的timeout,之所以配置这个选项是因为：
+1）在从服务器的角度，在同步阶段形成大的I/O(而不是一有点久复制点）
+2）在从服务器的角度（数据角度和ping命令），管理timeout
+3）从主服务器的角度设置从服务器的连接timeout（应答ACK给ping命令）
+重要的是，确保这个时间比repl-ping-slave-period这个指令配置的时间长，否则在主服务器和从服务器之间的网速不好时，每一次都会到达timeout命令。
+
 	# Disable TCP_NODELAY on the slave socket after SYNC?
 	#
 	# If you select "yes" Redis will use a smaller number of TCP packets and
@@ -412,6 +468,12 @@
 	# or when the master and slaves are many hops away, turning this to "yes" may
 	# be a good idea.
 	repl-disable-tcp-nodelay no
+
+这个选项配置在数据同步完成后是否停止tcp连接。
+如果你配置此项为yes，那么redis会使用一个小量的tcp包，并且占用很少的带宽来发送到从服务器。但是在从服务器端可以为这个发送的时间设置一个延时显现（即不是立即显示此数据，而是经过一段时间）使用默认的配置的话,在linux平台上会高达40微秒。
+如果你在从服务器端为此选项设置为no,那么将不会有延时，但是为了连接需要更多的带宽。
+默认的，我们倾向于低延时。但是在非常大的传输环境中，或者主服务器和从服务器经常出故障，那么将此项设置为yes会是一个好得主意。
+这里的配置为  repl-disable-tcp-nodelay no
 	
 	# Set the replication backlog size. The backlog is a buffer that accumulates
 	# slave data when slaves are disconnected for some time, so that when a slave
@@ -425,6 +487,11 @@
 	# The backlog is only allocated once there is at least a slave connected.
 	#
 	# repl-backlog-size 1mb
+
+这个选项设置同步backlog的大小。backlog是一个一段时间内当从服务器失去连接时，用来收集从服务器数据的缓存。因此，当一个从服务器想再次连接时，一个全同步就不是必须的了，部分同步就已经足够了。只需要将从服务器失去连接时丢失的数据发送到从服务器即可。
+这个backlog文件越大，那么从服务器就可以失去连接更多的时间。再次联通后，就可以开始部分同步。
+backlog只在至少一台从服务器连接时才收据数据。
+这里的配置示例为  repl-backlog-size 1mb  
 	
 	# After a master has no longer connected slaves for some time, the backlog
 	# will be freed. The following option configures the amount of seconds that
@@ -434,6 +501,10 @@
 	# A value of 0 means to never release the backlog.
 	#
 	# repl-backlog-ttl 3600
+
+当主服务器与所有的从服务器在一段时间内不连接时，backlog就会被删除。下面的选项是用来配置这个失去连接的时间（单位为秒）。为删除backlog的等待时间，从最后一台从服务器失去连接时开始计时。
+示例配置为   repl-backlog-ttl 3600
+
 	
 	# The slave priority is an integer number published by Redis in the INFO output.
 	# It is used by Redis Sentinel in order to select a slave to promote into a
@@ -449,7 +520,13 @@
 	#
 	# By default the priority is 100.
 	slave-priority 100
-	
+
+从服务器的优先级是一个整型数，会在info命令打印出来。他是在一个主服务器不正常工作时，Redis Sentinel（redis哨兵）为了选择一个从服务器作为主服务器的参考。
+有一个低优先级的数字设置更被可能转换为主服务器。因此，假如有三台从服务器优先级分比为 10, 100, 和25，那么Sentinel将会选择优先级数字设置为10的那个从服务器，因为它的数字最低。
+然而，特别被指定为0的服务器不会被选择作为主服务器，因此Redis Sentinel不会选择一个优先级数字为10的从服务器。
+默认的设置是 100
+这里的配置是  slave-priority 100
+
 	# It is possible for a master to stop accepting writes if there are less than
 	# N slaves connected, having a lag less or equal than M seconds.
 	#
@@ -471,6 +548,17 @@
 	#
 	# By default min-slaves-to-write is set to 0 (feature disabled) and
 	# min-slaves-max-lag is set to 10.
+
+如果低于N数量的从服务器连接时，主服务器可能会停止接受写入数据（就set新的数据）。或者至少有一个M秒的延时后停止接受写入数据。
+这N个从服务器必须是在线状态。
+延时的秒数，必须小于等于指定的值，是从接收到了最后一个从服务器的ping命令（一般每一秒发送一次，因为多台服务器都是没10秒发送，这造成了主服务接受ping命令是每个1秒甚至更少）后开始计时的。
+这一选项并不会保证N个从服务器接受写命令。但是，会限制丢失写命令的暴露窗口处，以免不数量的从服务器达到指定的秒数。
+例如，至少需要连接3个从服务器，延时小于等于10秒，这样设置：
+min-slaves-to-write 3
+min-slaves-max-lag 10
+
+设置为1另一个设置为0会禁用此特性
+默认的min-slaves-to-write会设置为0,（即禁用了此特性），min-slaves-max-lag设置为10秒
 	
 	################################## SECURITY ###################################
 	
