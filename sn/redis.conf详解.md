@@ -593,7 +593,19 @@ min-slaves-max-lag 10
 	#
 	# Please note that changing the name of commands that are logged into the
 	# AOF file or transmitted to slaves may cause problems.
-	
+
+安全
+在客户端执行任何其他的命令之前需要提供认证的密码。在你不相信其他连接到主机（正在运行redis服务器）的客户端的环境下这是非常有用的。
+为了向后兼容这个选项应该被注释，因为大多数人不需要认证（例如：他们自己运行自己的服务器）
+警告：由于redis非常的快，以至于一个外部用户使用一台好的机器可以在一秒钟内执行150次的密码尝试。这意味着你需要一个非常复杂的密码否则密码将会很容易被攻破。
+示例配置为：requirepass foobared，这里foobared是密码
+
+命令重命名
+在一个共享环境中可能需要改变危险的命令的名字。例如：CONFIG选项可以重命名一些命令使之非常的复杂不容易被猜到。以便于在仅能在内部适应被不能被一般的客户端使用。
+例如：示例配置：rename-command CONFIG b840fc02d524045429941cc15f59e41cb7be6c52。也可以通过将命令重命名为空字符串来完全杀掉一个命令（即使得一个命令失效）。如：
+rename-command CONFIG ""
+请注意：改变了命令的名字会被日志记录进AOF文件中，将它发送给从服务器也许会导致产生一些问题。
+
 	################################### LIMITS ####################################
 	
 	# Set the max number of connected clients at the same time. By default
@@ -606,6 +618,11 @@ min-slaves-max-lag 10
 	# an error 'max number of clients reached'.
 	#
 	# maxclients 10000
+
+限制
+设置在同一时间内可以连通的最大客户端数量。默认值为10000个客户端。然而，如果redis服务器不能够配置进程限制文件以允许连接的客户端最大数量，那么这个最大允许连接客户端数量被设置为当前限制文件指定的数量减去32.（因为redis为一些内部的文件解释器提供了服务，这些也算作连接）
+一旦数量达到指定的限制值，那么redis服务器会关闭所有的新的连接并发送一个错误信息‘max number of clients reached‘
+示例配置为：maxclients 10000
 	
 	# If Redis is to be used as an in-memory-only cache without any kind of
 	# persistence, then the fork() mechanism used by the background AOF/RDB
@@ -616,6 +633,10 @@ min-slaves-max-lag 10
 	# This flag may not be combined with any of the other flags that configure
 	# AOF and RDB operations.
 	# persistence-available [(yes)|no]
+
+如果redis仅仅被用来作为内存的缓存而不做任何的数据持久化，那么在AOF/RDB持久化背景下的fork()机制就不是必须的。作为一个优化，在redis的windows版本里所有持久化操作都能够被关闭。这个将会重定位堆分配到系统的堆分配器。并且还会禁用会导致fork()的操作：如BGSAVE and BGREWRITEAOF.
+这个选项不会与配置AOF and RDB操作的选项结合。
+示例配置为：persistence-available [(yes)|no]
 	
 	# Don't use more memory than the specified amount of bytes.
 	# When the memory limit is reached Redis will try to remove keys
@@ -644,7 +665,15 @@ min-slaves-max-lag 10
 	# out-of-memory exception if the heap limit is reached.
 	#
 	# maxmemory <bytes>
-	
+
+不要比指定的数量使用更多的内存。当内存使用达到了内存限制时，redis会选择的内存回收策略来移除某些key，来限制内存的使用。
+如果redis根据选定的内存收集错误移除key，或者那个选项被配置为noeviction，那么redis将会开始响应错误信息给会使用较多内存的操作，如set lpush等等。并且会继续响应get命令。
+当将redis作为本地缓存或者强制给它设置一个内存限制的情况下，这个选项非常有用。
+警告：如果给主服务器设置了内存使用限制并且主服务器连接了从服务器，为了满足从服务器的输出缓冲的大小被从使用的内存数量中减去。因此在某些key被移除时网络问题或者再同步不会触发循环。相反，从服务器的缓冲充满的是被删除的key，触发删除更多的key等等，知道整个数据库被删除为空。
+简而言之，如果你有从服务器连接主服务器，建议为内存限制设置一个较低的值。以便于留有一些系统内存供从服务器输出缓冲使用。（但是当内存管理选项设置为noeviction时，则这样设置并不是必须的）
+警告：如果不设置内存限制，当连接达到高峰时，达到内存限制时，将会使redis因为内存超出异常而结束。
+示例配置为：maxmemory <bytes>
+
 	# MAXMEMORY POLICY: how Redis will select what to remove when maxmemory
 	# is reached. You can select among five behaviors:
 	# 
@@ -667,6 +696,22 @@ min-slaves-max-lag 10
 	# The default is:
 	#
 	# maxmemory-policy volatile-lru
+
+内存管理政策：指的是当达到最大内存使用限制时，redis将会选择移除哪些keys
+volatile-lru:使用LRU算法删除带有过期时间的keys
+allkeys-lru:使用LRU算法删除任何一个key
+volatile-random：随机删除设置了过期时间的key
+allkeys-random:随机删除任何一个key
+volatile-ttl:删除最接近过期时间的key
+noeviction:根本不过期任何的key,当写入新的key时返回错误，不能写入
+注意：以上任何一个内存管理政策，当没有合适的key被移除时，在写入操作时redis都会返回一个错误信息
+写这些命令的日期：set setnx setex append
+incr decr rpush lpush rpushx lpushx linsert lset rpoplpush sadd
+sinter sinterstore sunion sunionstore sdiff sdiffstore zadd zincrby
+zunionstore zinterstore hset hsetnx hmset hincrby incrby decrby
+getset mset msetnx exec sort
+默认的设置为：
+maxmemory-policy volatile-lru
 	
 	# LRU and minimal TTL algorithms are not precise algorithms but approximated
 	# algorithms (in order to save memory), so you can select as well the sample
@@ -675,6 +720,9 @@ min-slaves-max-lag 10
 	# using the following configuration directive.
 	#
 	# maxmemory-samples 3
+
+LRU和最小TTL算法不是精确地算法，但是是近似精确地算法（为了节省内存）。因此你也可以选择一个样本去检查这个问题。例如：默认的redis会选择3个keys并且移除一个近期最少使用的key。使用下面的配置项你可以改变这个样本的数量
+示例配置为：maxmemory-samples 3
 	
 	############################## APPEND ONLY MODE ###############################
 	
@@ -697,9 +745,19 @@ min-slaves-max-lag 10
 	# Please check http://redis.io/topics/persistence for more information.
 	
 	appendonly no
+
+追加模式
+默认的redis异步同步数据，将数据同步到磁盘。在很多应用中这个模式很好。但是redis的进程或者停电问题也许会导致几分钟的写入数据丢失（这依赖于save points配置项）
+只追加文件是一个可选择的持久化模式，这一模式提供了更好地持久期。例如：使用默认的同步策略（详细信息参考配置文件接下来的内容），在极端情况下像停电或者在一个单独的吸入操作时redis进程出现了一些错误而操作系统正常工作的情况下，redis能够仅仅丢失一秒的数据。
+AOF and RDB持久化策略可以再没有问题的的时候同时被开启。如果AOF在redis启动时开启，那么redis将会加载AOF文件，这个文件能够更好地保证持久化。
+请参考：http://redis.io/topics/persistence for more information.
+这里的配置为：appendonly no
 	
 	# The name of the append only file (default: "appendonly.aof")
 	appendfilename "appendonly.aof"
+
+追加文件的名字（默认是appendonly.aof）
+这里的配置为：appendfilename "appendonly.aof"
 	
 	# The fsync() call tells the Operating System to actually write data on disk
 	# instead of waiting for more data in the output buffer. Some OS will really flush
@@ -727,6 +785,17 @@ min-slaves-max-lag 10
 	# appendfsync always
 	appendfsync everysec
 	# appendfsync no
+
+fsync()函数告诉操作系统在磁盘中写入数据而不是等待输出缓冲中有更多的数据。一些操作系统会真的清空磁盘上的数据，而其他的操作系统则立即尝试写入。
+redis支持三种不同的模式：
+no:不进行fsync，仅仅让操作系统清空数据当他需要那样做时。更快
+always:在每一次在追加日志中写入后fsync，慢但是非常的安全。
+everysec:每一秒仅仅fsync一次。效率介于前两者之间
+默认的是everysec，因为在速度和数据安全性之间那通常是正确的折中。这依赖于你的理解，如果你对no模式放心，为了更好地性能（考虑到默认的持久化模式为快照，你可以忍受一些数据的丢失），那么将会在需要时操作系统会清空输出缓冲。或者相反，使用always模式将会非常的慢但是比everysec要更加的安全。
+查看更多的细节，参考：http://antirez.com/post/redis-persistence-demystified.html
+如果你不确定的话，使用everysec模式
+示例配置为：appendfsync always       appendfsync no
+这里的配置为：appendfsync everysec
 	
 	# When the AOF fsync policy is set to always or everysec, and a background
 	# saving process (a background save or AOF log background rewriting) is
@@ -747,6 +816,12 @@ min-slaves-max-lag 10
 	# If you have latency problems turn this to "yes". Otherwise leave it as
 	# "no" that is the safest pick from the point of view of durability.
 	no-appendfsync-on-rewrite no
+
+当AOF fsync政策被设置为always或者everysec时，后台运行的保存进程（后台进行的保存或者AOF log重写）在磁盘上运行了一个很大的I/O操作。咋一些linux配置中，redis也许会在fsync() call上阻断很长的时间。注意：目前对于这个问题没有解决办法，甚至在不同的线程下执行fsync也会阻断同步的写操作。
+为了减轻这个问题，可能需要使用下面的选项：在BGSAVE or BGREWRITEAOF正在运行时，那将会阻止fsync()被调用。
+这意味着，但一个子进程正在保存数据时，redis的持久化与appendfsync none相同。在实际周期，这意味着（在linux默认配置下）会丢失高达30秒的日志。
+如果你有潜在的问题，将这个选项设置为yes，否则将它设置为no，从持久化角度来看设置为no是最安全的
+这里的配置为：no-appendfsync-on-rewrite no
 	
 	# Automatic rewrite of the append only file.
 	# Redis is able to automatically rewrite the log file implicitly calling
