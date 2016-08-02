@@ -839,9 +839,16 @@ everysec:每一秒仅仅fsync一次。效率介于前两者之间
 	#
 	# Specify a percentage of zero in order to disable the automatic AOF
 	# rewrite feature.
-	
+
 	auto-aof-rewrite-percentage 100
 	auto-aof-rewrite-min-size 64mb
+
+append only file的自动重写配置
+当AOF日志的大小以指定的百分比增长时，redis能够隐含的调用函数BGREWRITEAOF来重写日志文件。
+它是这样的工作的：当最后一次重写之后，redis记录了AOF文件的大小（如果从重启以来没有重写发生，那么就是用开始时AOF文件的大小）
+基本的大小是用来与当前的大小比较的。如果当前的大小比指定的百分比大那么重写操作就会被触发。而且，你需要指定一个AOF文件被重写的最小大小。这有利于避免即使AOF文件以指定的百分比增长了，但是文件仍然很小时重写AOF文件。
+指定这个百分比为0以便于禁用AOF重写的特性
+这里的配置为auto-aof-rewrite-percentage 100，值得是AOF文件每增长100时就会重写AOF文件，auto-aof-rewrite-min-size 64mb指的是这个特性只有在AOF文件的大小超过64M时才会有效。
 	
 	# An AOF file may be found to be truncated at the end during the Redis
 	# startup process, when the AOF data gets loaded back into memory.
@@ -866,6 +873,12 @@ everysec:每一秒仅仅fsync一次。效率介于前两者之间
 	# Redis will try to read more data from the AOF file but not enough bytes
 	# will be found.
 	aof-load-truncated yes
+
+当AOF数据被记载进了内存，当redis开启的时候会发现AOF文件内容被删除了。当redis正在运行的系统崩溃时会发生此现象。尤其是当一个ext4 文件系统已经加载了但是没有进行data=ordered操作（然而当redis崩溃的时候或者宕机但是操作系统正常工作的时候，这种现象不会发生-即AOF文件内容被删除的情况）
+如果AOF文件在最后被发现内容被删除了，那么redis或者产生一个错误后退出，或者尽可能的加载更多的数据（当前默认情况下是如此）然后开启。下面的选项是控制此行为的。
+如果aof-load-truncated被设置为yes，被删除的AOF文件会被加载，并且redis服务器会开启并忽略这个记录（这个记录会通知用户这个事件）。否则，如果这个选项被配置为no，redis服务器会宕机并产生错误并且会拒绝重启。当这个选项被设置为no的时候，用户需要在服务器重启之前通过redis-check-aof选项修改正AOF文件。
+注意：如果在redis服务器运行中间AOF文件的内容被删除了，那么服务器就会立即退出并产生一个错误。只有在redis希望读到更多的文件但是没有足够多的数据被发现时，这个选项才会被应用。
+这里的配置为 aof-load-truncated yes
 	
 	################################ LUA SCRIPTING  ###############################
 	
@@ -884,6 +897,13 @@ everysec:每一秒仅仅fsync一次。效率介于前两者之间
 	#
 	# Set it to 0 or a negative value for unlimited execution without warnings.
 	lua-time-limit 5000
+
+lua脚本
+lua脚本的最大执行时间（以微妙为单位）
+如果已经达到了最大执行时间，redis将会记录它-一个脚本在达到最大允许执行时间后仍然在执行并且会对请求返回一个错误。
+当一个长时间运行的脚本超过了它的最大执行时间，只有SCRIPT KILL和SHUTDOWN NOSAVE两个命令可以使用。第一个命令常常会停止一个脚本（该脚本不包含写命令）。一旦一个写命令已经被脚本发出并但是用户不想等待自然地停止脚本，第二个命令是唯一可以关闭服务器的方法。
+如果将这个下选项设置为0或者一个负值，将不会限制脚本的运行时间并且没有任何警告。
+这里的配置为 lua-time-limit 5000
 	
 	################################ REDIS CLUSTER  ###############################
 	#
@@ -906,6 +926,10 @@ everysec:每一秒仅仅fsync一次。效率介于前两者之间
 	# overlapping cluster configuration file names.
 	#
 	# cluster-config-file nodes-6379.conf
+
+redis集群
+实验性的警告：redis被看做稳定的code,
+
 	
 	# Cluster node timeout is the amount of milliseconds a node must be unreachable
 	# for it to be considered in failure state.
