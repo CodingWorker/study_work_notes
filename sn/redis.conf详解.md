@@ -928,15 +928,21 @@ lua脚本的最大执行时间（以微妙为单位）
 	# cluster-config-file nodes-6379.conf
 
 redis集群
-实验性的警告：redis被看做稳定的code,
+实验性的警告：redis被看做稳定的code,然而为了是它能够成熟，我们需要非常多的认真的用户在生产环境中开发它。
+正常的redis示例不能成为redis集群的一部分。只有作为redis集群的几点的redis才能够。为了作为一个redis集群的节点开启redis，启用下面的redis集群支持，取消下面的注释：
+cluster-enabled yes，这一选项开启了redis集群支持
 
+每一个集群节点都有一个集群的配置文件，不要打算手动编辑这个文件，它是被redis节点创建并更新的。每一个redis集群节点需要一个不同的集群配置文件。确保集群实例运行在相同的系统上，不要有会覆盖集群配置文件的文件名字。
+这里的配置为：cluster-config-file nodes-6379.conf，指的是这个redis作为集群节点的配置文件名。
 	
 	# Cluster node timeout is the amount of milliseconds a node must be unreachable
 	# for it to be considered in failure state.
 	# Most other internal time limits are multiple of the node timeout.
 	#
 	# cluster-node-timeout 15000
-	
+
+Cluster node timeout是个判断一个节点处于失效状态的微秒数，在这段时间内如果不能连接节点就认为这个节点失效了。其他大多数内部时间限制都是这个节点timeout的很多倍。示例配置为 cluster-node-timeout 15000，注意单位是微妙。
+
 	# A slave of a failing master will avoid to start a failover if its data
 	# looks too old.
 	#
@@ -955,6 +961,11 @@ redis集群
 	#    disconnection with the master (if the replication link is currently down).
 	#    If the last interaction is too old, the slave will not try to failover
 	#    at all.
+
+如果他的数据很旧的话，崩溃主机的从服务器将会避免开启失效备援。一个从服务器有一个精确地测定他的数据的有效时间是很难的，因此下面两个检查被执行。
+1）如果这里有很多的的从服务器能够做到失效备援，他们之间将会交换信息，以便给从服务提供更好地复制偏移(即尽可能多的从主服务器拿到数据）。从服务器将会通过这个数据偏移（即从主服务器拿到的数据）来排名，根据他们的排名来决定失效备援的延迟比例。
+2）每一个从服务器会计算他们最后一次与主服务器交互的时间。这个交互可以是最后一次ping或者接受的到命令（如果主服务器仍然处于连接状态）。或则从与主服务器失去连接经过的时间（如果复制连接当前处于关闭状态）。如果最后一次交互时间非常的久，那么这个从服务器就根本不会尝试失效备援。
+
 	#
 	# The point "2" can be tuned by user. Specifically a slave will not perform
 	# the failover if, since the last interaction with the master, the time
@@ -966,6 +977,11 @@ redis集群
 	# is 10, and assuming a default repl-ping-slave-period of 10 seconds, the
 	# slave will not try to failover if it was not able to talk with the master
 	# for longer than 310 seconds.
+
+第二点能够被用户自己调节，特别是一个从服务器不会执行失效备援，如果最后与主服务器交互的时间或者自从最后一次连接过去的时间大于以下的值：
+(node-timeout * slave-validity-factor) + repl-ping-slave-period
+这样，例如：如果node-timeout设置为30秒，slave-validity-factor是10，假设默认的repl-ping-slave-period是10秒。如果从服务器不能够与主服务器talk超过310秒的话，从服务器是不会开启失效备援的。
+
 	#
 	# A large slave-validity-factor may allow slaves with too old data to failover
 	# a master, while a too small value may prevent the cluster from being able to
@@ -981,7 +997,12 @@ redis集群
 	# the cluster will always be able to continue.
 	#
 	# cluster-slave-validity-factor 10
-	
+
+一个大的slave-validity-factor也许允许一个有很久的数据的从服务器对主服务器启动失效备援。如果设置的非常小，那么会阻止集群选择一个从服务器来执行失效备援。
+为了最大化可能，可能设置slave-validity-factor为0.那代表着无论最后一次主从服务器交互的时间从服务器都会尝试执行失效备援。然而，他们将会尝试根据他们的排名来应用一个延时复制。
+0是唯一一个能够保证所有的部分治理集群并且保证集群能够继续工作的值。
+cluster-slave-validity-factor 10
+
 	# Cluster slaves are able to migrate to orphaned masters, that are masters
 	# that are left without working slaves. This improves the cluster ability
 	# to resist to failures as otherwise an orphaned master can't be failed over
@@ -1000,6 +1021,11 @@ redis集群
 	# in production.
 	#
 	# cluster-migration-barrier 1
+
+集群从服务器能够被转移到孤立的主服务器上，那些主服务器指的就是没有从服务器的主服务器。这一个特性提高了集群抵抗失败的能力。否则，一个孤立的主服务器不能够失败，如果他没有任何从服务器。
+从服务器会转移到主服务器上，只有当仍然有一个给定的数量的从服务器运行在他们就的主服务器上。这个数字就是migration barrier。如果这个值配置为1意味着从服务器将会在至少有一个从服务器在主服务器上工作的时候才会转移。其他数字类似。它通常代表着你期望在你的集群上的主机上的从服务器的数目。
+默认的值为1(从服务器只有在至少一个从服务器在原来的主服务器上工作的时候才会转移）。为了禁止从服务器的转移，只需要将它的值设置为一个很大的值。在生产环境或者是debug环境下将它设置为0是有效的。
+示例的配置为  cluster-migration-barrier 1
 	
 	# By default Redis Cluster nodes stop accepting queries if they detect there
 	# is at least an hash slot uncovered (no available node is serving it).
@@ -1016,7 +1042,12 @@ redis集群
 	
 	# In order to setup your cluster make sure to read the documentation
 	# available at http://redis.io web site.
-	
+
+如果redis集群发现至少有一个hash slot没有被覆盖（不能获得的节点redis正在服务它），默认的redis集群节点将会停止接受请求。这样能够说得：如果集群的一部分机器宕机的话（例如一定范围之内的hash slots不再能够被覆盖），那么所有的集群组成最终都将不能获得。如果这些hash slots一旦被覆盖后，那么集群将会被立即接受请求。
+然而，有些时候你希望正在工作的集群的子集能够继续接受请求来响应它所能覆盖的key.为了达到这样的效果，只需要将cluster-require-full-coverage设置为no即可。
+示例的配置为 cluster-require-full-coverage yes，这代表集群必须能够覆盖所有的数据的时候才会继续接受请求。
+为了开启你的redis集群，一定要读文档，该文档可以从	http://redis.io网站获得。
+
 	################################## SLOW LOG ###################################
 	
 	# The Redis Slow Log is a system to log queries that exceeded a specified
@@ -1036,10 +1067,19 @@ redis集群
 	# to one second. Note that a negative number disables the slow log, while
 	# a value of zero forces the logging of every command.
 	slowlog-log-slower-than 10000
+
+慢日志
+redis的慢日志是一个为了记录请求执行了特定时间的系统。这里的执行时间不包括I/O操作，像告诉客户端、发送响应等等，而仅仅包含了实际需要执行命令的时间（这是命令的唯一的执行，在这线程受阻并且在同一时间处理其他的请求）
+你可以通过连个参数来配置慢日志系统：一个告诉redis什么是执行时间（以微秒为单位），超过后就会被记录到日志；另一个参数是慢日志的长度。当一个新的命令被记录在日志的时候，之前的最久的日志就会被从慢日志中移除。
+下面的时间是以微秒为单位来描述的。因此1000000与1秒是相等的。注意：如果设置为一个负值的话就会禁用慢日志功能。然而如果设置为0就会强制慢日志记录每一个命令。
+这里的配置为： slowlog-log-slower-than 10000，表示查过10毫秒的命令就会被记录进慢日志。
 	
 	# There is no limit to this length. Just be aware that it will consume memory.
 	# You can reclaim memory used by the slow log with SLOWLOG RESET.
 	slowlog-max-len 128
+
+在这里，对慢日志的长度没有限制，只需要集的这会消耗内存。你可以通过SLOWLOG RESET来重新分配慢日志所使用的内存
+这里的配置为 slowlog-max-len 128。
 	
 	################################ LATENCY MONITOR ##############################
 	
@@ -1061,6 +1101,13 @@ redis集群
 	# monitoring can easily be enalbed at runtime using the command
 	# "CONFIG SET latency-monitor-threshold <milliseconds>" if needed.
 	latency-monitor-threshold 0
+
+LATENCY监控
+在redis正在运行的时候，redis的LATENCY监控子系统取样不同的操作。这是为了收集与redis实例的latency资源相关的数据。
+通过LATENCY命令，用户可以看到这个信息，以便于打印出报告并获得报告。
+这个系统只会记录那些执行时间等于或者超过通过latency-monitor-threshold配置指令指定的微秒数。当把这个配置项的值设置为0，latency监控系统就会关闭。
+如果你没有latency问题，大多数情况下不需要latency监控系统，因此都会被关闭。而且该系统收集数据也会产生影响。尽管影响非常的小，但是在大的加载情况下也会很明显。如果需要的话，Latency监控系统很容易在运行期间通过CONFIG SET latency-monitor-threshold <milliseconds>指令来开启。
+这里的配置为 latency-monitor-threshold 0，即禁用了该特性。
 	
 	############################# Event notification ##############################
 	
@@ -1115,12 +1162,19 @@ redis集群
 	# threshold. These thresholds can be configured using the following directives.
 	hash-max-ziplist-entries 512
 	hash-max-ziplist-value 64
+
+高级配置项
+当哈希表有一个很小数据规模时，哈希表使用高效的内存数据机构来编码hash表。并且最大的存储规模不超过一个给定的临界值。可以通过以下的配置设置这些临界值。
+这里的配置为： hash-max-ziplist-entries 512   hash-max-ziplist-value 64，即在此规模下是一种处理方式，当超过了这个临界值的话就可能采用另一种存储方式。
 	
 	# Similarly to hashes, small lists are also encoded in a special way in order
 	# to save a lot of space. The special representation is only used when
 	# you are under the following limits:
 	list-max-ziplist-entries 512
 	list-max-ziplist-value 64
+
+与哈希表相同，为了节省空间一个小规模的list数据也会以一种特殊的方式来存储。当在下面配置的范围内曹邹数据的时候会以这种方式来存储和操作。
+这里的配置为 ：list-max-ziplist-entries 512  list-max-ziplist-value 64，即在这个范围内是一种数据处理方式（为了节省空间），超过这个范围就是另一种方式。
 	
 	# Sets have a special encoding in just one case: when a set is composed
 	# of just strings that happen to be integers in radix 10 in the range
@@ -1128,12 +1182,18 @@ redis集群
 	# The following configuration setting sets the limit in the size of the
 	# set in order to use this special memory saving encoding.
 	set-max-intset-entries 512
+
+set类型数据只在一种情况下采用特殊的编码处理方法：当一个集合组成只是字符串，并且范围是基数10的64位有符号整数。下面的配置项是用来配置集合大小的限制。以使用这个节省内存的编码方式。
+这里的配置为set-max-intset-entries 512，即在某个范围内可以使用特殊的方式对集合数据进行编码。
 	
 	# Similarly to hashes and lists, sorted sets are also specially encoded in
 	# order to save a lot of space. This encoding is only used when the length and
 	# elements of a sorted set are below the following limits:
 	zset-max-ziplist-entries 128
 	zset-max-ziplist-value 64
+
+与哈希表类似，为了节省内存的空间有序集合也使用了一种特殊的方式来编码。这一编码方式只有在集合的长度和元素在下面配置的范围之下才会采用：
+这里的配置为： zset-max-ziplist-entries 128  zset-max-ziplist-value 64，即在此范围内会采用特殊的编码方式以节省内存。
 	
 	# HyperLogLog sparse representation bytes limit. The limit includes the
 	# 16 bytes header. When an HyperLogLog using the sparse representation crosses
@@ -1148,6 +1208,11 @@ redis集群
 	# ~ 10000 when CPU is not a concern, but space is, and the data set is
 	# composed of many HyperLogLogs with cardinality in the 0 - 15000 range.
 	hll-sparse-max-bytes 3000
+
+HyperLogLog sparse representation字节限制。这个限制包含一个16个字节的头部。当一个HyperLogLog使用sparse超过了这个限制，他就会被转换为压缩表现。
+一个比16000大的数值完全是没有用的，因为在那个点压缩表现更加的高效。
+为了既利用空间效率有不至于降低PFADD太多（在sparse编码方式下是O(N)的时间复杂度），建议值是3000以下。当相比CPU来说更关心空间的时候可以使得这个值可以增加到10000.而且这个数据集合会压缩HyperLogLogs为0 - 15000范围大小的块。
+这里的配置为hll-sparse-max-bytes 3000。 
 	
 	# Active rehashing uses 1 millisecond every 100 milliseconds of CPU time in
 	# order to help rehashing the main Redis hash table (the one mapping top-level
@@ -1168,6 +1233,12 @@ redis集群
 	# use "activerehashing yes" if you don't have such hard requirements but
 	# want to free memory asap when possible.
 	activerehashing yes
+
+为了帮助rehashing主要的哈希表（指的是映射高等级键和值），可激活rehashing以便于利用1%的CPU时间来rehashing。redis使用这个哈希表实施来表现出懒惰rehashing：你对正在rehashing的表的操作越多，rehashing步骤执行的越多。因此如果服务器是idle，rehashing从来不会完成，并且一些更多的内存空间被哈希表使用了。
+为了激活rehash主要的字典（hash表），默认的是是这个millisecond达到每秒10次。
+如果不确定的话：
+如果你有硬latency需求的话使用activerehashing no配置，在你的redis环境中每次请求都延迟两微秒不是一件好事。
+这里的配置为： activerehashing yes
 	
 	# The client output buffer limits can be used to force disconnection of clients
 	# that are not reading data from the server fast enough for some reason (a
@@ -1183,6 +1254,15 @@ redis集群
 	# The syntax of every client-output-buffer-limit directive is the following:
 	#
 	# client-output-buffer-limit <class> <hard limit> <soft limit> <soft seconds>
+
+客户端输出缓冲限制能够很有用来强制取消客户端的连接，当这个客户端由于某些原因（一个通常的原因是Pub/Sub客户端不能够像publisher生成数据那样快的处理他们）没有从服务器已足够快的速度读取数据。
+这个限制可以为三个不类的客户端设置不同的值：
+normal类型客户端：normal类型客户端包含MONITOR客户端（应该是能够执行monitor命令）
+slave类型客户端：slave clients
+pubsub类型客户端：这个客户端至少订阅了一个pubsub频道或者pattern
+任何一种client-output-buffer-limit指令都如同下面这样：
+client-output-buffer-limit <class> <hard limit> <soft limit> <soft seconds>
+
 	#
 	# A client is immediately disconnected once the hard limit is reached, or if
 	# the soft limit is reached and remains reached for the specified number of
@@ -1205,6 +1285,13 @@ redis集群
 	client-output-buffer-limit normal 0 0 0
 	client-output-buffer-limit slave 256mb 64mb 60
 	client-output-buffer-limit pubsub 32mb 8mb 60
+
+当达到了hard limit的限制，或者达到了soft limit并且在达到后等待了指定的等到时间，客户端会立即关闭连接。
+例如：如果hard limit被设置为32M,soft limit被设置为16M，并且等待时间被设置为10秒，在输出缓冲达到了32M时客户端会立即关闭连接，或者如果客户端达到了16M并且继续超过该限制达到10秒，那么客户端会立即关闭。
+默认情况下normal类型的客户端没有此限制，因为在没有请求的时候他们不接受数据。因此只有asynchronous（异步复制）类型的客户端也许会创建一个脚本，标明请求的速度快于它能读取数据的速度。
+相反，这里为pubsub and slave两种类型的客户端设置了默认的设置，因为在push fashion里subscribers and slaves类型的客户端都接受数据。
+如果指定值为0就可以禁用hard或者soft的限制。
+这里的配置为 client-output-buffer-limit normal 0 0 0  client-output-buffer-limit slave 256mb 64mb 60  client-output-buffer-limit pubsub 32mb 8mb 60
 	
 	# Redis calls an internal function to perform many background tasks, like
 	# closing connections of clients in timeot, purging expired keys that are
@@ -1228,6 +1315,14 @@ redis集群
 	# in order to commit the file to the disk more incrementally and avoid
 	# big latency spikes.
 	aof-rewrite-incremental-fsync yes
+
+redis调用了很多的内置函数来执行任务，像关闭连接的，删除掉不会再被请求的过期的key等等。
+并非所有的任务的执行频率都一样，但是redis根据指定的hz的值来检查任务的执行情况。
+默认的情况下，hz被设置为10，当redis是idle的情况下提高这个值会使用更多的CPU。但是同时在有更多的过期的key的时候，这能够使得redis响应的表现的更好。而且timeouts能够被更精确地处理。
+这个范围是1到500.然而一个大于100的值通常不是一个好的主意。大多数的用户使用默认值10，只有在有很低的latency要求的时候可以调高此值到100.
+这里的配置为： hz 10
+但一个子进程重写了AOF文件，如果开启了下面的选项，文件将会在每产生了32M的数据的时候就将会同步。这有利于提高文件到磁盘的同步，并且能够避免大的latency spikes。
+这里的配置为：aof-rewrite-incremental-fsync yes
 	
 	################################## INCLUDES ###################################
 	
@@ -1238,3 +1333,7 @@ redis集群
 	#
 	# include /path/to/local.conf
 	# include /path/to/other.conf
+
+包含外部文件
+在这里可以包含进一个或者多个外部文件。如果你对redis服务器有一整套标准的配置但是又想对每一个服务器定制化一些配置这个选项是非常有用的。包含进的文件中也可以包含其他的文件，因此灵活的使用该功能。
+示例配置为： include /path/to/local.conf   include /path/to/other.conf
